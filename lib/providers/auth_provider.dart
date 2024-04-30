@@ -321,6 +321,8 @@ class AuthorizationProvider extends ChangeNotifier {
         is2WheelRepairSelected: snapshot['is2WheelRepairSelected'],
         is6WheelRepairSelected: snapshot['is6WheelRepairSelected'],
         isTowSelected: snapshot['isTowSelected'],
+        latitude: snapshot['latitude'],
+        longitude: snapshot['longitude'],
       );
       _uid = mechanicModel.uid;
     });

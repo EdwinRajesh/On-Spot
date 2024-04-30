@@ -6,12 +6,16 @@ class MechanicModel {
   String createdAt;
   String? phoneNumber;
   String? uid;
+  final double? latitude; // Add latitude field
+  final double? longitude;
   final bool is4WheelRepairSelected;
   final bool is6WheelRepairSelected;
   final bool is2WheelRepairSelected;
   final bool isTowSelected;
 
   MechanicModel({
+    required this.latitude,
+    required this.longitude,
     required this.name,
     required this.email,
     required this.createdAt,
@@ -28,6 +32,8 @@ class MechanicModel {
   // from map
   factory MechanicModel.fromMap(Map<String, dynamic> map) {
     return MechanicModel(
+      longitude: map['longitude'],
+      latitude: map['latitude'],
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       uid: map['uid'] ?? '',
@@ -45,6 +51,8 @@ class MechanicModel {
   // to map
   Map<String, dynamic> toMap() {
     return {
+      "longitude": longitude,
+      "latitude": latitude,
       "qualification": qualification,
       "name": name,
       "email": email,

@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'providers/auth_provider.dart' as MyAppAuthorizationProvider;
+import '../../../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'utils/colors.dart';
+import '../../../utils/colors.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -164,9 +164,7 @@ class Messages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ap = Provider.of<MyAppAuthorizationProvider.AuthorizationProvider>(
-        context,
-        listen: false);
+    final ap = Provider.of<AuthorizationProvider>(context, listen: false);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8),

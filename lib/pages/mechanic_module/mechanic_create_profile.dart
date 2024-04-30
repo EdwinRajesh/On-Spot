@@ -1,10 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:io';
+import 'package:location/location.dart';
 
 import 'package:first/pages/mechanic_module/mechanic_home.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../models/mechanic_model.dart';
 import '../../providers/auth_provider.dart';
@@ -60,7 +62,7 @@ class _MechanicProfileState extends State<MechanicProfile> {
         body: SingleChildScrollView(
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(28, 40, 28, 40),
+              padding: const EdgeInsets.fromLTRB(28, 0, 28, 16),
               child: Column(
                 children: [
                   Text(
@@ -213,7 +215,7 @@ class _MechanicProfileState extends State<MechanicProfile> {
                   CustomButton(
                       text: "SIGN UP",
                       onPressed: () {
-                        storeData();
+                        _getLocationUpdate();
                       })
                 ],
               ),
@@ -222,7 +224,40 @@ class _MechanicProfileState extends State<MechanicProfile> {
         ));
   }
 
-  void storeData() async {
+  Future<void> _getLocationUpdate() async {
+    final Location locationcontroller = Location();
+    LatLng? currentposition;
+
+    bool _serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    _serviceEnabled = await locationcontroller.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await locationcontroller.requestService();
+    }
+
+    permissionGranted = await locationcontroller.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationcontroller.requestPermission();
+    }
+
+    if (permissionGranted == PermissionStatus.granted) {
+      locationcontroller.onLocationChanged
+          .listen((LocationData currentLocation) {
+        if (currentLocation.latitude != null &&
+            currentLocation.longitude != null) {
+          setState(() {
+            currentposition =
+                LatLng(currentLocation.latitude!, currentLocation.longitude!);
+            // Call storeData method with the current position
+            storeData(currentposition);
+          });
+        }
+      });
+    }
+  }
+
+  void storeData(LatLng? currentPosition) async {
     final ap = Provider.of<AuthorizationProvider>(context, listen: false);
     MechanicModel mechanicModel = MechanicModel(
       qualification: qualificationController.text.trim(),
@@ -236,6 +271,8 @@ class _MechanicProfileState extends State<MechanicProfile> {
       is6WheelRepairSelected: is6WheelRepairSelected,
       is2WheelRepairSelected: is2WheelRepairSelected,
       isTowSelected: isTowSelected,
+      latitude: currentPosition?.latitude,
+      longitude: currentPosition?.longitude,
     );
 
     ap.saveMechanicDataToFirebase(
