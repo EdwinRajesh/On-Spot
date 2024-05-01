@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_final_fields
 
 import 'dart:io';
 
+import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -13,7 +14,6 @@ import '../../utils/button.dart';
 import '../../utils/colors.dart';
 import '../../utils/utils.dart';
 import 'user_cards/car_textfield.dart';
-import 'user_vehicle.dart';
 
 class UserAddVehicle extends StatefulWidget {
   const UserAddVehicle({super.key});
@@ -23,8 +23,7 @@ class UserAddVehicle extends StatefulWidget {
 }
 
 class _UserAddVehicleState extends State<UserAddVehicle> {
-  List<File> _selectedImages =
-      []; // Initialize _selectedImages as an empty list
+  List<File> _selectedImages = [];
 
   final TextEditingController _vehicleNameController = TextEditingController();
   final TextEditingController _registrationNumberController =
@@ -199,10 +198,9 @@ class _UserAddVehicleState extends State<UserAddVehicle> {
     ap.saveCarDataToFirebase(
       context: context,
       OnSuccess: () {
-        Navigator.pushAndRemoveUntil(
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const UserVehiclePage()),
-          (route) => false,
+          MaterialPageRoute(builder: (context) => UserNavPage()),
         );
       },
       carModel: carModel,

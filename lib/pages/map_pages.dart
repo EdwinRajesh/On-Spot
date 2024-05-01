@@ -1,5 +1,6 @@
-// ignore_for_file: prefer_final_fields
+// ignore_for_file: prefer_const_constructors
 
+import 'package:first/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -26,60 +27,71 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: chatService.getMechanicsStream("is4WheelRepairSelected"),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Map<String, dynamic>> mechanicsData = snapshot.data!;
-            if (mechanicsData.isNotEmpty) {
-              List<LatLng> mechanicLocations = mechanicsData.map((mechanic) {
-                double latitude = (mechanic['latitude'] as double?) ?? 0.0;
-                double longitude = (mechanic['longitude'] as double?) ?? 0.0;
-                return LatLng(latitude, longitude);
-              }).toList();
+    return currentposition != null
+        ? Scaffold(
+            body: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: chatService.getMechanicsStream("is4WheelRepairSelected"),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<Map<String, dynamic>> mechanicsData = snapshot.data!;
+                  if (mechanicsData.isNotEmpty) {
+                    List<LatLng> mechanicLocations =
+                        mechanicsData.map((mechanic) {
+                      double latitude =
+                          (mechanic['latitude'] as double?) ?? 0.0;
+                      double longitude =
+                          (mechanic['longitude'] as double?) ?? 0.0;
+                      return LatLng(latitude, longitude);
+                    }).toList();
 
-              return GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: currentposition!,
-                  zoom: 15,
-                ),
-                markers: {
-                  if (currentposition != null)
-                    Marker(
-                      markerId: const MarkerId("currentLocation"),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueGreen),
-                      position: currentposition!,
-                    ),
-                  for (LatLng location in mechanicLocations)
-                    Marker(
-                      markerId: MarkerId(location.toString()),
-                      position: location,
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueRed,
+                    return GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: currentposition!,
+                        zoom: 15,
                       ),
-                    ),
-                },
-                polylines: {
-                  if (currentposition != null)
-                    Polyline(
-                      polylineId: const PolylineId("directions"),
-                      points: [mechanicLocations.first, currentposition!],
-                      color: Colors.blue,
-                      width: 3,
-                    ),
-                },
-              );
-            }
-          }
-          // Return a loading or error state widget if snapshot has no data or data is empty
-          return Center(
-            child: CircularProgressIndicator(),
+                      markers: {
+                        if (currentposition != null)
+                          Marker(
+                            markerId: const MarkerId("currentLocation"),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                                BitmapDescriptor.hueGreen),
+                            position: currentposition!,
+                          ),
+                        for (LatLng location in mechanicLocations)
+                          Marker(
+                            markerId: MarkerId(location.toString()),
+                            position: location,
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueRed,
+                            ),
+                          ),
+                      },
+                      // polylines: {
+                      //   if (currentposition != null)
+                      //     Polyline(
+                      //       polylineId: const PolylineId("directions"),
+                      //       points: [mechanicLocations.first, currentposition!],
+                      //       color: Colors.blue,
+                      //       width: 3,
+                      //     ),
+                      // },
+                    );
+                  }
+                }
+                // Return a loading or error state widget if snapshot has no data or data is empty
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          )
+        : Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
+            ),
           );
-        },
-      ),
-    );
   }
 
   Future<void> _getLocationUpdate() async {

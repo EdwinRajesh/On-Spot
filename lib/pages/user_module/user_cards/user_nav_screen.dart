@@ -30,6 +30,8 @@ class _UserNavPageState extends State<UserNavPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: PageStorageKey('user_nav_screen'), // Add PageStorageKey here
+
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
