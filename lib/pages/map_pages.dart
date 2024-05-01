@@ -6,6 +6,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../providers/chat_services.dart';
+import 'map_module.dart/mech_details_onmap.dart';
+//import 'mechanic_details_page.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -18,6 +20,12 @@ class _MapPageState extends State<MapPage> {
   final ChatService chatService = ChatService();
   final Location locationController = Location();
   LatLng? currentposition;
+
+  // Variable to keep track of the selected mechanic
+  int? selectedMechanicIndex;
+
+  // Scroll controller for ListView
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -44,37 +52,148 @@ class _MapPageState extends State<MapPage> {
                       return LatLng(latitude, longitude);
                     }).toList();
 
-                    return GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: currentposition!,
-                        zoom: 15,
-                      ),
-                      markers: {
-                        if (currentposition != null)
-                          Marker(
-                            markerId: const MarkerId("currentLocation"),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                                BitmapDescriptor.hueGreen),
-                            position: currentposition!,
+                    return Stack(
+                      children: [
+                        GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: currentposition!,
+                            zoom: 15,
                           ),
-                        for (LatLng location in mechanicLocations)
-                          Marker(
-                            markerId: MarkerId(location.toString()),
-                            position: location,
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                              BitmapDescriptor.hueRed,
+                          markers: {
+                            if (currentposition != null)
+                              Marker(
+                                markerId: const MarkerId("currentLocation"),
+                                icon: BitmapDescriptor.defaultMarkerWithHue(
+                                    BitmapDescriptor.hueGreen),
+                                position: currentposition!,
+                              ),
+                            for (int i = 0; i < mechanicLocations.length; i++)
+                              Marker(
+                                markerId: MarkerId(
+                                    i.toString()), // Use the index as marker ID
+                                position: mechanicLocations[i],
+                                icon: BitmapDescriptor.defaultMarkerWithHue(
+                                  BitmapDescriptor.hueRed,
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    selectedMechanicIndex = i;
+                                  });
+                                  _scrollToSelectedMechanic();
+                                },
+                              ),
+                          },
+                        ),
+                        Positioned(
+                          bottom: 20.0,
+                          left: 20.0,
+                          right: 20.0,
+                          child: SizedBox(
+                            height: 120.0,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: mechanicsData.length,
+                              itemBuilder: (context, index) {
+                                final mechanic = mechanicsData[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedMechanicIndex = index;
+                                    });
+                                    _scrollToSelectedMechanic();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            MechanicDetailsPage(
+                                          mechanic: mechanic,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 200.0,
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
+                                    decoration: BoxDecoration(
+                                      color: index == selectedMechanicIndex
+                                          ? Colors
+                                              .blue[100] // Highlighted color
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                mechanic['name'] ??
+                                                    'Mechanic Name',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.0,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4.0),
+                                              CircleAvatar(
+                                                radius: 30,
+                                                backgroundImage: NetworkImage(
+                                                  mechanic['profilePic'] ??
+                                                      'profilePic',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 8, 16, 0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                mechanic['rating'] ?? "NA",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18.0,
+                                                    color: Colors.amber),
+                                              ),
+                                              Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                      },
-                      // polylines: {
-                      //   if (currentposition != null)
-                      //     Polyline(
-                      //       polylineId: const PolylineId("directions"),
-                      //       points: [mechanicLocations.first, currentposition!],
-                      //       color: Colors.blue,
-                      //       width: 3,
-                      //     ),
-                      // },
+                        ),
+                      ],
                     );
                   }
                 }
@@ -112,15 +231,25 @@ class _MapPageState extends State<MapPage> {
       locationController.onLocationChanged
           .listen((LocationData currentLocation) {
         if (currentLocation.latitude != null &&
-            currentLocation.longitude != null &&
-            mounted) {
-          // Check if the widget is still mounted
+            currentLocation.longitude != null) {
           setState(() {
             currentposition =
                 LatLng(currentLocation.latitude!, currentLocation.longitude!);
           });
         }
       });
+    }
+  }
+
+  // Function to scroll to the selected mechanic
+  void _scrollToSelectedMechanic() {
+    if (selectedMechanicIndex != null) {
+      _scrollController.animateTo(
+        selectedMechanicIndex! *
+            216, // Adjust this value according to your item height
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     }
   }
 }

@@ -5,22 +5,23 @@ import 'package:flutter/material.dart';
 import 'colors.dart';
 
 class SecondaryButton extends StatelessWidget {
-  final double height;
-  final double width;
+  // final double height;
+  // final double width;
   final String text;
   final VoidCallback onPressed;
-  const SecondaryButton(
-      {super.key,
-      required this.text,
-      required this.onPressed,
-      required this.height,
-      required this.width});
+  const SecondaryButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    // required this.height,
+    // required this.width"
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
-      height: height,
+      // width: width,
+      // height: height,
       child: ElevatedButton(
           onPressed: onPressed,
           style: ButtonStyle(
@@ -31,7 +32,7 @@ class SecondaryButton extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8)))),
           child: Text(
             text,
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 14),
           )),
     );
   }

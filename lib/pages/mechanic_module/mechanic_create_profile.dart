@@ -34,6 +34,7 @@ class _MechanicProfileState extends State<MechanicProfile> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController qualificationController = TextEditingController();
+  TextEditingController bioController = TextEditingController();
 
   @override
   void dispose() {
@@ -115,100 +116,24 @@ class _MechanicProfileState extends State<MechanicProfile> {
                   SizedBox(
                     height: 8,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Color.fromARGB(255, 236, 244, 243)),
-                          child: CheckboxListTile(
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 16),
-                            activeColor: primaryColor,
-                            value: is4WheelRepairSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                is4WheelRepairSelected = value!;
-                              });
-                            },
-                            title: Text("4-Wheel Repair",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Expanded(
-                          child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Color.fromARGB(255, 236, 244, 243)),
-                        child: CheckboxListTile(
-                          activeColor: primaryColor,
-                          value: is2WheelRepairSelected,
-                          onChanged: (value) {
-                            setState(() {
-                              is2WheelRepairSelected = value!;
-                            });
-                          },
-                          title: Text("2-wheel Repair",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14)),
-                        ),
-                      )),
-                    ],
-                  ),
+                  serviceCheckBox(),
                   SizedBox(
                     height: 4,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Color.fromARGB(255, 236, 244, 243)),
-                          child: CheckboxListTile(
-                            activeColor: primaryColor,
-                            value: is6WheelRepairSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                is6WheelRepairSelected = value!;
-                              });
-                            },
-                            title: Text("6-wheel Repair",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Color.fromARGB(255, 236, 244, 243)),
-                          child: CheckboxListTile(
-                            activeColor: primaryColor,
-                            value: isTowSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                isTowSelected = value!;
-                              });
-                            },
-                            title: Text("Tow Service",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  secondServiceCheckBox(),
+                  // TextField(
+                  //     controller: bioController,
+                  //     maxLines: 4,
+                  //     cursorColor: primaryColor,
+                  //     decoration: InputDecoration(
+                  //       hintText: "Bio",
+                  //       prefixIcon: Icon(Icons.person),
+                  //       border: OutlineInputBorder(),
+                  //       focusedBorder: OutlineInputBorder(
+                  //         borderSide: BorderSide(color: primaryColor),
+                  //       ),
+                  //       floatingLabelBehavior: FloatingLabelBehavior.always,
+                  //     )),
                   SizedBox(
                     height: 16,
                   ),
@@ -222,6 +147,98 @@ class _MechanicProfileState extends State<MechanicProfile> {
             ),
           ),
         ));
+  }
+
+  Row secondServiceCheckBox() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Color.fromARGB(255, 236, 244, 243)),
+            child: CheckboxListTile(
+              activeColor: primaryColor,
+              value: is6WheelRepairSelected,
+              onChanged: (value) {
+                setState(() {
+                  is6WheelRepairSelected = value!;
+                });
+              },
+              title: Text("6-wheel Repair",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 4,
+        ),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Color.fromARGB(255, 236, 244, 243)),
+            child: CheckboxListTile(
+              activeColor: primaryColor,
+              value: isTowSelected,
+              onChanged: (value) {
+                setState(() {
+                  isTowSelected = value!;
+                });
+              },
+              title: Text("Tow Service",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row serviceCheckBox() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Color.fromARGB(255, 236, 244, 243)),
+            child: CheckboxListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              activeColor: primaryColor,
+              value: is4WheelRepairSelected,
+              onChanged: (value) {
+                setState(() {
+                  is4WheelRepairSelected = value!;
+                });
+              },
+              title: Text("4-Wheel Repair",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 4,
+        ),
+        Expanded(
+            child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Color.fromARGB(255, 236, 244, 243)),
+          child: CheckboxListTile(
+            activeColor: primaryColor,
+            value: is2WheelRepairSelected,
+            onChanged: (value) {
+              setState(() {
+                is2WheelRepairSelected = value!;
+              });
+            },
+            title: Text("2-wheel Repair",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          ),
+        )),
+      ],
+    );
   }
 
   Future<void> _getLocationUpdate() async {
