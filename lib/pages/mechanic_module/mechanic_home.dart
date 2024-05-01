@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/mechanic_module/mechanic_profile.dart';
 import 'package:flutter/material.dart';
@@ -73,13 +73,50 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
                   ),
                 ],
               ),
-              _buildUserList(chatService, auth),
+              //_buildUserList(chatService, auth),
+              _buildUserRequestList(chatService, auth),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildUserRequestList(ChatService chatService, FirebaseAuth auth) {
+  return StreamBuilder(
+    stream:
+        chatService.getUserRequestStream(auth.currentUser?.phoneNumber ?? ''),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return Text("Error: ${snapshot.error}");
+      }
+
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator(); // Show a loading indicator
+      }
+
+      if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+        return Text(
+            "No user requests available"); // Show a message when there is no data
+      }
+
+      // Build the list of user request items
+      return Container(
+        height: 200,
+        child: ListView(
+          children: (snapshot.data as List).map<Widget>((userData) {
+            return _buildUserRequestListItem(userData, context);
+          }).toList(),
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildUserRequestListItem(
+    Map<String, dynamic> userData, BuildContext context) {
+  return UserTile(text: userData['carId'], onTap: () {});
 }
 
 Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
@@ -129,43 +166,3 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
     return Container();
   }
 }
-
-
-// class MechanicChatPage extends StatelessWidget {
-//   final String userEmail;
-//   final String userID;
-
-//   MechanicChatPage({super.key, required this.userEmail, required this.userID});
-
-//   final TextEditingController _messageController = TextEditingController();
-//   final ChatService _chatService = ChatService();
-//   final FirebaseAuth auth = FirebaseAuth.instance;
-
-//   void sendMessage() async {
-//     if (_messageController.text.isNotEmpty) {
-//       await _chatService.sendMessage(userID, _messageController.text);
-//       _messageController.clear();
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: tertiaryColor,
-//       appBar: AppBar(
-//         title: Text(userEmail),
-//         backgroundColor: secondaryColor,
-//         foregroundColor: Colors.white,
-//         elevation: 0,
-//       ),
-//       body: Column(
-//         children: [
-//           SizedBox(
-//             height: 10,
-//           ),
-//           Expanded(child: Text('Hai')),
-//         ],
-//       ),
-//     );
-//   }
-// }

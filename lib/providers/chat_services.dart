@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/message_model.dart';
+import '../models/request_model.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -37,6 +38,53 @@ class ChatService {
         return user;
       }).toList();
     });
+  }
+
+  Stream<List<Map<String, dynamic>>> getUserRequestStream(String mechanicId) {
+    return _firestore
+        .collection("service_requests")
+        .where("mechanicId", isEqualTo: mechanicId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final requestData = doc.data();
+        if (requestData.isNotEmpty) {
+          print("Request data available: $requestData");
+        } else {
+          print("No request data available");
+        }
+        return requestData;
+      }).toList();
+    });
+  }
+
+  Future<void> sendServiceRequest(String mechanicId, String carName,
+      String carId, String problemDescription) async {
+    final User? currentUser = _auth.currentUser;
+
+    if (currentUser != null) {
+      final String currentUserId = currentUser.uid;
+
+      ServiceRequest newRequest = ServiceRequest(
+        carName: carName,
+        mechanicId: mechanicId,
+        carId: carId,
+        problemDescription: problemDescription,
+      );
+
+      List<String> ids = [currentUserId, mechanicId];
+      ids.sort();
+      String chatRoomID = ids.join('_');
+
+      await _firestore
+          .collection("service_requests")
+          .doc(chatRoomID)
+          .set(newRequest.toMap());
+    } else {
+      // Handle the case when the current user is null
+      print("Error: Current user is null");
+      // You can also show an error message to the user or take appropriate action
+    }
   }
 
   Future<void> sendMessage(String receiverID, String message) async {

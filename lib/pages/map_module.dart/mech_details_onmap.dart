@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:first/pages/user_module/user_vehicle.dart';
+import 'package:first/pages/user_module/send_mechanic_car.dart';
 import 'package:first/utils/colors.dart';
 import 'package:first/utils/secondary.dart';
 import 'package:flutter/material.dart';
@@ -112,7 +112,9 @@ class MechanicDetailsPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UserVehiclePage()),
+                            builder: (context) => SendMechanicVehicle(
+                                  mechanic: mechanic,
+                                )),
                       );
                     },
                     text: 'Continue Booking',
