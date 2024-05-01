@@ -112,7 +112,9 @@ class _MapPageState extends State<MapPage> {
       locationController.onLocationChanged
           .listen((LocationData currentLocation) {
         if (currentLocation.latitude != null &&
-            currentLocation.longitude != null) {
+            currentLocation.longitude != null &&
+            mounted) {
+          // Check if the widget is still mounted
           setState(() {
             currentposition =
                 LatLng(currentLocation.latitude!, currentLocation.longitude!);

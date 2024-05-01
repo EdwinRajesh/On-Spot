@@ -184,6 +184,21 @@ class _UserAddVehicleState extends State<UserAddVehicle> {
   }
 
   void storeData() async {
+    if (_manufactureController.text.isEmpty ||
+        _vehicleNameController.text.isEmpty ||
+        _registrationNumberController.text.isEmpty ||
+        _selectedFuelType == null ||
+        _selectedManufactureYear == null ||
+        _selectedImages.isEmpty) {
+      // Display a Snackbar message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill all the fields.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     final ap = Provider.of<AuthorizationProvider>(context, listen: false);
 
     CarModel carModel = CarModel(
@@ -200,7 +215,10 @@ class _UserAddVehicleState extends State<UserAddVehicle> {
       OnSuccess: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserNavPage()),
+          MaterialPageRoute(
+              builder: (context) => UserNavPage(
+                    index: 0,
+                  )),
         );
       },
       carModel: carModel,

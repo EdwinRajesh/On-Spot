@@ -53,12 +53,14 @@ class _WelcomePageState extends State<WelcomePage> {
                       onPressed: () async {
                         if (ap.isSignedIn == true) {
                           await ap.getDataFromSP().whenComplete(() async =>
-                              await ap.getCarDataFromSP().whenComplete(() =>
-                                  Navigator.push(
+                              await ap
+                                  .getCarDataFromSP()
+                                  .whenComplete(() => Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              UserNavPage()))));
+                                          builder: (context) => UserNavPage(
+                                                index: 1,
+                                              )))));
                         } else {
                           Navigator.push(
                               context,

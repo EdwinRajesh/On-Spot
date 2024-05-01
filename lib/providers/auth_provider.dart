@@ -248,6 +248,52 @@ class AuthorizationProvider extends ChangeNotifier {
     }
   }
 
+  //***************************DELETE CAR */
+
+// ...
+
+  Future<bool> deleteCarFromFirestore(String userId, CarModel car) async {
+    try {
+      // Get a reference to the Firestore collection 'users'
+      CollectionReference usersCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      // Get a reference to the user document with the provided userId
+      DocumentReference userDocRef = usersCollection.doc(userId);
+
+      // Get a reference to the 'user_car' subcollection within the user document
+      CollectionReference userCarCollection = userDocRef.collection('user_car');
+
+      // Find the car document matching the provided CarModel object
+      QuerySnapshot querySnapshot = await userCarCollection
+          .where('manufacture', isEqualTo: car.manufacture)
+          .where('model', isEqualTo: car.model)
+          .where('year', isEqualTo: car.year)
+          .where('fuel', isEqualTo: car.fuel)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first matching document (assuming there's only one match)
+        DocumentSnapshot carDocSnapshot = querySnapshot.docs.first;
+
+        // Delete the car document
+        await carDocSnapshot.reference.delete();
+
+        // Return true if deletion is successful
+        return true;
+      } else {
+        print('No matching car found for deletion');
+        return false;
+      }
+    } catch (e) {
+      // Print the error message if an error occurs
+      print('Error deleting car: $e');
+
+      // Return false if an error occurs
+      return false;
+    }
+  }
+
   //*************************GET DATA FROM FIRESTORE
 
   Future getDataFromFirestore() async {

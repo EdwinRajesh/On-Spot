@@ -95,9 +95,9 @@ class _NearbyMechanicsScreenState extends State<NearbyMechanicsScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => ChatPage(
-                receiverEmail: userData["email"],
-                receiverID: userData["uid"],
-              ),
+                  receiverEmail: userData["email"],
+                  receiverID: userData["uid"],
+                  profilePic: userData["profilePic"]),
             ),
           );
         },

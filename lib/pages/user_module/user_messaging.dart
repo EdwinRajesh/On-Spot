@@ -12,8 +12,13 @@ import '../../utils/colors.dart';
 class ChatPage extends StatelessWidget {
   final String receiverEmail;
   final String receiverID;
+  final String profilePic;
 
-  ChatPage({super.key, required this.receiverEmail, required this.receiverID});
+  ChatPage(
+      {super.key,
+      required this.receiverEmail,
+      required this.receiverID,
+      required this.profilePic});
 
   final TextEditingController _messageController = TextEditingController();
 
@@ -31,7 +36,19 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: tertiaryColor,
       appBar: AppBar(
-        title: Text(receiverEmail),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: primaryColor,
+              backgroundImage: NetworkImage(profilePic),
+              radius: 22,
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            Text(receiverEmail),
+          ],
+        ),
         backgroundColor: secondaryColor,
         foregroundColor: Colors.white,
         elevation: 0,

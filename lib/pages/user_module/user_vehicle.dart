@@ -1,7 +1,9 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, use_build_context_synchronously
 
-import 'package:first/pages/user_module/user_home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,17 +21,36 @@ class UserVehiclePage extends StatefulWidget {
 }
 
 class _UserVehiclePageState extends State<UserVehiclePage> {
-  List<CarModel>? carList;
   IconData customIcon = IconData(0xea8e, fontFamily: 'MaterialIcons');
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
-    // Cancel any ongoing asynchronous operations
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+    void deleteCar(CarModel car) async {
+      final ap = Provider.of<AuthorizationProvider>(context, listen: false);
+      bool success = await ap.deleteCarFromFirestore(
+        auth.currentUser?.phoneNumber ?? '',
+        car,
+      );
+
+      if (success) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => UserNavPage(
+                      index: 0,
+                    )));
+        // Optionally, you can refresh the car list or perform any other necessary actions
+      } else {}
+    }
+
     String capitalizeFirstLetter(String text) {
       if (text.isEmpty) {
         return '';
@@ -54,12 +75,7 @@ class _UserVehiclePageState extends State<UserVehiclePage> {
             ],
           ),
           child: AppBar(
-            leading: GestureDetector(
-                child: Icon(Icons.arrow_back),
-                onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => UserHomeScreen()),
-                    )),
+            automaticallyImplyLeading: false,
             title: Center(
                 child: Text(
               "My Vehicle",
@@ -106,24 +122,34 @@ class _UserVehiclePageState extends State<UserVehiclePage> {
                       itemCount: cars.length,
                       itemBuilder: (context, index) {
                         final car = cars[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                width: 1.0, // Adjust the width as needed
-                                color: Colors
-                                    .black, // Specify the color of the border
+                        return Slidable(
+                          endActionPane:
+                              ActionPane(motion: StretchMotion(), children: [
+                            SlidableAction(
+                              onPressed: (context) {
+                                deleteCar(car);
+                              },
+                              icon: Icons.delete,
+                              backgroundColor: primaryColor,
+                            )
+                          ]),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  width: 1.0, // Adjust the width as needed
+                                  color: Colors
+                                      .black, // Specify the color of the border
+                                ),
                               ),
                             ),
-                          ),
-                          child: GestureDetector(
                             child: ListTile(
                               leading: car.carPictures.isNotEmpty
                                   ? Image.network(
                                       car.carPictures[
                                           0], // Display the first picture in the list
-                                      width: 60,
-                                      height: 100,
+                                      width: 70,
+                                      height: 150,
                                       fit: BoxFit.cover,
                                     )
                                   : Icon(
@@ -170,26 +196,6 @@ class _UserVehiclePageState extends State<UserVehiclePage> {
                                 ],
                               ),
                             ),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Delete'),
-                                    content: Text('Dialog Content'),
-                                    actions: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog
-                                        },
-                                        child: Text('Close'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
                           ),
                         );
                       },

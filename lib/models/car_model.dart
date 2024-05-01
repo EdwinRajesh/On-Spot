@@ -4,7 +4,7 @@ class CarModel {
   List<String> carPictures; // Updated to a list of strings
 
   String? fuel;
-  String year;
+  String? year;
   String? uid;
 
   CarModel({

@@ -117,6 +117,7 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
+              profilePic: userData['profilePic'],
               receiverEmail: userData["email"],
               receiverID: userData["uid"],
             ),

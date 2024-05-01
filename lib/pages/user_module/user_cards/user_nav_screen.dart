@@ -12,7 +12,8 @@ import '../user_profile.dart';
 import '../user_vehicle.dart';
 
 class UserNavPage extends StatefulWidget {
-  const UserNavPage({super.key});
+  final int index;
+  const UserNavPage({super.key, required this.index});
 
   @override
   State<UserNavPage> createState() => _UserNavPageState();
@@ -26,6 +27,13 @@ class _UserNavPageState extends State<UserNavPage> {
     UserHomeScreen(),
     UserProfilePage()
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex =
+        widget.index; // Set the initial index from the widget's parameter
+  }
 
   @override
   Widget build(BuildContext context) {
