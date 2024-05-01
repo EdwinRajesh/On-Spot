@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'user_cards/chat_bot.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/colors.dart';
-import 'available_mechanics.dart';
 import 'user_cards/card.dart';
 import 'user_cards/drawer_user.dart';
 
@@ -63,7 +62,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NearbyMechanicsScreen(
+                            builder: (context) => MapPage(
                               selectedService: 'is2WheelRepairSelected',
                               serviceName: '2-Wheel Assistance',
                             ),
@@ -80,7 +79,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NearbyMechanicsScreen(
+                            builder: (context) => MapPage(
                               selectedService: 'is4WheelRepairSelected',
                               serviceName: '4-Wheel Assistance',
                             ),
@@ -100,7 +99,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NearbyMechanicsScreen(
+                            builder: (context) => MapPage(
                               selectedService: 'is6WheelRepairSelected',
                               serviceName: '6-Wheel Assistance',
                             ),
@@ -117,7 +116,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NearbyMechanicsScreen(
+                            builder: (context) => MapPage(
                               selectedService: 'isTowService',
                               serviceName: 'Tow Service',
                             ),
@@ -126,18 +125,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       },
                     ),
                   ],
-                ),
-                GestureDetector(
-                  child: UserCard(
-                    name: "Map",
-                    svgPath: 'assets/tow.svg',
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MapPage()),
-                    );
-                  },
                 ),
               ],
             ),

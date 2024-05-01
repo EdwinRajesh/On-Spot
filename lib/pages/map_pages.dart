@@ -10,7 +10,10 @@ import 'map_module.dart/mech_details_onmap.dart';
 //import 'mechanic_details_page.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  final String selectedService;
+  final String serviceName;
+  const MapPage(
+      {super.key, required this.selectedService, required this.serviceName});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -37,8 +40,35 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return currentposition != null
         ? Scaffold(
+            appBar: PreferredSize(
+                preferredSize: Size.fromHeight(kToolbarHeight),
+                child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1), // Shadow color
+                          spreadRadius: 2, // Spread radius
+                          blurRadius: 4, // Blur radius
+                          offset: Offset(0, 2), // Offset in the y direction
+                        ),
+                      ],
+                    ),
+                    child: AppBar(
+                      title: Text(widget.serviceName,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: secondaryColor)),
+                      leading: GestureDetector(
+                        child: Icon(Icons.arrow_back),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      toolbarHeight: 32,
+                    ))),
             body: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: chatService.getMechanicsStream("is4WheelRepairSelected"),
+              stream: chatService.getMechanicsStream(widget.selectedService),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List<Map<String, dynamic>> mechanicsData = snapshot.data!;
