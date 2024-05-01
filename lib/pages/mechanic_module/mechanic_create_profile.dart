@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
 import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:location/location.dart';
 
 import 'package:first/pages/mechanic_module/mechanic_home.dart';
@@ -116,24 +117,28 @@ class _MechanicProfileState extends State<MechanicProfile> {
                   SizedBox(
                     height: 8,
                   ),
+                  TextField(
+                    controller: bioController,
+                    cursorColor: primaryColor,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: "Bio",
+                      prefixIcon: Icon(Icons.book),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryColor),
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
                   serviceCheckBox(),
                   SizedBox(
                     height: 4,
                   ),
                   secondServiceCheckBox(),
-                  // TextField(
-                  //     controller: bioController,
-                  //     maxLines: 4,
-                  //     cursorColor: primaryColor,
-                  //     decoration: InputDecoration(
-                  //       hintText: "Bio",
-                  //       prefixIcon: Icon(Icons.person),
-                  //       border: OutlineInputBorder(),
-                  //       focusedBorder: OutlineInputBorder(
-                  //         borderSide: BorderSide(color: primaryColor),
-                  //       ),
-                  //       floatingLabelBehavior: FloatingLabelBehavior.always,
-                  //     )),
                   SizedBox(
                     height: 16,
                   ),
@@ -280,6 +285,7 @@ class _MechanicProfileState extends State<MechanicProfile> {
       qualification: qualificationController.text.trim(),
       email: emailController.text.trim(),
       name: nameController.text.trim(),
+      bio: bioController.text.trim(),
       phoneNumber: "",
       profilePic: "",
       createdAt: '',

@@ -356,6 +356,7 @@ class AuthorizationProvider extends ChangeNotifier {
         .get()
         .then((DocumentSnapshot snapshot) {
       _mechanicModel = MechanicModel(
+        bio: snapshot['bio'],
         name: snapshot['name'],
         email: snapshot['email'],
         createdAt: snapshot['createdAt'],
