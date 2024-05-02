@@ -103,10 +103,13 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                     try {
                       ChatService chatService = ChatService();
                       await chatService.sendServiceRequest(
-                          widget.mechanic['uid'],
-                          widget.car.model,
-                          widget.car.uid!,
-                          problemDescription);
+                          mechanicId: widget.mechanic['uid'],
+                          carName: widget.car.model,
+                          picture: widget.car.carPictures[0],
+                          carId: widget.car.uid!,
+                          problemDescription: problemDescription,
+                          year: widget.car.year!,
+                          fuel: widget.car.fuel!);
                       Navigator.push(
                         context,
                         MaterialPageRoute(

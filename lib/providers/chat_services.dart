@@ -58,18 +58,28 @@ class ChatService {
     });
   }
 
-  Future<void> sendServiceRequest(String mechanicId, String carName,
-      String carId, String problemDescription) async {
+  Future<void> sendServiceRequest(
+      {required String mechanicId,
+      required String carName,
+      required String picture,
+      required String carId,
+      required String problemDescription,
+      required String year,
+      required String fuel}) async {
     final User? currentUser = _auth.currentUser;
 
     if (currentUser != null) {
       final String currentUserId = currentUser.uid;
 
       ServiceRequest newRequest = ServiceRequest(
-        carName: carName,
+        model: carName,
         mechanicId: mechanicId,
         carId: carId,
         problemDescription: problemDescription,
+        year: year,
+        fuel: fuel,
+        manufacture: fuel,
+        picture: picture,
       );
 
       List<String> ids = [currentUserId, mechanicId];
