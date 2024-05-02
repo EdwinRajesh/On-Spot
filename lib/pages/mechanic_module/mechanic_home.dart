@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/mechanic_module/mechanic_profile.dart';
+import 'package:first/utils/expansion_tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -116,7 +117,14 @@ Widget _buildUserRequestList(ChatService chatService, FirebaseAuth auth) {
 
 Widget _buildUserRequestListItem(
     Map<String, dynamic> userData, BuildContext context) {
-  return UserTile(text: userData['carId'], onTap: () {});
+  return ExpandedTiles(
+      text: userData['carId'],
+      fuel: userData['fuel'] ?? "",
+      year: userData['year'] ?? "",
+      picture: userData['picture'] ?? "",
+      model: userData['model'] ?? "",
+      manufacture: userData['manufacture'] ?? "",
+      problemDescription: userData['problemDescription'] ?? "");
 }
 
 Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
