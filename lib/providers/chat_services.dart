@@ -17,11 +17,7 @@ class ChatService {
   ChatService();
 
   Stream<List<Map<String, dynamic>>> getMechanicsStream(selectedService) {
-    return _firestore
-        .collection("mechanic")
-        .where(selectedService, isEqualTo: true)
-        .snapshots()
-        .map((snapshot) {
+    return _firestore.collection("mechanic").snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final user = doc.data();
 

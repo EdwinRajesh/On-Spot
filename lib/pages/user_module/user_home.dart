@@ -129,8 +129,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
                 GestureDetector(
                   child: UserCard(
-                    name: "Chat Service",
-                    svgPath: 'assets/tow.svg',
+                    name: "Text Mechanics",
+                    svgPath: 'assets/message.svg',
                   ),
                   onTap: () {
                     Navigator.push(

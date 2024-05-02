@@ -147,7 +147,12 @@ Widget _buildUserRequestListItem(
               manufacture: userData['manufacture'] ?? "",
               problemDescription: userData['problemDescription'] ?? "");
         } else {
-          return Text('User not found');
+          return Center(
+            child: Text(
+              'No requests present',
+              style: TextStyle(color: secondaryColor, fontSize: 32),
+            ),
+          );
         }
       });
 }
