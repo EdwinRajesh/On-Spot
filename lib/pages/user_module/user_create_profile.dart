@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:io';
 
-import 'package:first/pages/user_module/user_home.dart';
+import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -130,11 +130,13 @@ class _UserProfileState extends State<UserProfile> {
     ap.saveUserDataToFirebase(
         context: context,
         OnSuccess: () {
-          ap.saveUserDataToSP().then((value) => ap.setSignIn().then((value) =>
-              Navigator.pushAndRemoveUntil(
+          ap.saveUserDataToSP().then((value) =>
+              ap.setSignIn().then((value) => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const UserHomeScreen()),
+                      builder: (context) => const UserNavPage(
+                            index: 1,
+                          )),
                   (route) => false)));
         },
         userModel: userModel,

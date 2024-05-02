@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/mechanic_module/mechanic_profile.dart';
 import 'package:first/utils/expansion_tiles.dart';
@@ -74,8 +75,11 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
                   ),
                 ],
               ),
-              //_buildUserList(chatService, auth),
               _buildUserRequestList(chatService, auth),
+              SizedBox(
+                height: 48,
+              ),
+              _buildUserList(chatService, auth),
             ],
           ),
         ),
@@ -117,14 +121,35 @@ Widget _buildUserRequestList(ChatService chatService, FirebaseAuth auth) {
 
 Widget _buildUserRequestListItem(
     Map<String, dynamic> userData, BuildContext context) {
-  return ExpandedTiles(
-      text: userData['carId'],
-      fuel: userData['fuel'] ?? "",
-      year: userData['year'] ?? "",
-      picture: userData['picture'] ?? "",
-      model: userData['model'] ?? "",
-      manufacture: userData['manufacture'] ?? "",
-      problemDescription: userData['problemDescription'] ?? "");
+  return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userData['carId'])
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          // Explicitly cast the snapshot data to Map<String, dynamic>
+          Map<String, dynamic> userCarData =
+              (snapshot.data!.data() as Map<String, dynamic>);
+          String userName = userCarData['name'];
+          return ExpandedTiles(
+              userProfilePicture: userCarData['profilePic'] ?? "",
+              userName: userName,
+              text: userData['carId'],
+              fuel: userData['fuel'] ?? "",
+              year: userData['year'] ?? "",
+              picture: userData['picture'] ?? "",
+              model: userData['model'] ?? "",
+              manufacture: userData['manufacture'] ?? "",
+              problemDescription: userData['problemDescription'] ?? "");
+        } else {
+          return Text('User not found');
+        }
+      });
 }
 
 Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {

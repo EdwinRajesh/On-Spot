@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'colors.dart';
 
 class ExpandedTiles extends StatelessWidget {
+  final String userName;
+  final String userProfilePicture;
   final String text;
   final String fuel;
   final String year;
@@ -17,6 +19,8 @@ class ExpandedTiles extends StatelessWidget {
 
   const ExpandedTiles({
     super.key,
+    required this.userName,
+    required this.userProfilePicture,
     required this.text,
     required this.fuel,
     required this.year,
@@ -42,14 +46,23 @@ class ExpandedTiles extends StatelessWidget {
           color: secondaryColor, borderRadius: BorderRadius.circular(8)),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
-        leading: Icon(Icons.person),
-        title: Text(
-          text,
-          style: TextStyle(
-            color: primaryColor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        leading: CircleAvatar(
+          radius: 20, // Adjust the size of the circle avatar as needed
+          backgroundImage:
+              NetworkImage(userProfilePicture), // Provide the image URL
+        ),
+        title: Row(
+          children: [
+            SizedBox(width: 10),
+            Text(
+              userName,
+              style: TextStyle(
+                color: primaryColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         children: [
           Padding(

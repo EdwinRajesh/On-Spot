@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, library_prefixes, unnecessary_string_interpolations, prefer_const_literals_to_create_immutables
 
 import 'package:first/pages/map_pages.dart';
+import 'package:first/pages/user_module/available_mechanics.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -125,6 +126,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       },
                     ),
                   ],
+                ),
+                GestureDetector(
+                  child: UserCard(
+                    name: "Chat Service",
+                    svgPath: 'assets/tow.svg',
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NearbyMechanicsScreen(
+                              selectedService: "is4WheelRepairSelected",
+                              serviceName: "4 - wheel assist")),
+                    );
+                  },
                 ),
               ],
             ),
