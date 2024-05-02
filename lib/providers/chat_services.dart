@@ -37,21 +37,29 @@ class ChatService {
   }
 
   Stream<List<Map<String, dynamic>>> getUserRequestStream(String mechanicId) {
-    return _firestore
-        .collection("service_requests")
-        .where("mechanicId", isEqualTo: mechanicId)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final requestData = doc.data();
-        if (requestData.isNotEmpty) {
-          print("Request data available: $requestData");
-        } else {
-          print("No request data available");
-        }
-        return requestData;
-      }).toList();
-    });
+    try {
+      CollectionReference<Map<String, dynamic>> mechanicRef = FirebaseFirestore
+          .instance
+          .collection('mechanic')
+          .doc(mechanicId)
+          .collection('service_requests');
+
+      return mechanicRef.snapshots().map((snapshot) {
+        return snapshot.docs.map((doc) {
+          final requestData = doc.data();
+          if (requestData.isNotEmpty) {
+            print("Request data available: $requestData");
+          } else {
+            print("No request data available");
+          }
+          return requestData;
+        }).toList();
+      });
+    } catch (error) {
+      // Handle errors
+      print('Error retrieving service requests: $error');
+      return Stream.empty(); // Return an empty stream in case of error
+    }
   }
 
   Future<void> sendServiceRequest(
@@ -65,8 +73,6 @@ class ChatService {
     final User? currentUser = _auth.currentUser;
 
     if (currentUser != null) {
-      final String currentUserId = currentUser.uid;
-
       ServiceRequest newRequest = ServiceRequest(
         model: carName,
         mechanicId: mechanicId,
@@ -78,11 +84,11 @@ class ChatService {
         picture: picture,
       );
 
-      List<String> ids = [currentUserId, mechanicId];
-      ids.sort();
-      String chatRoomID = ids.join('_');
+      String chatRoomID = currentUser.phoneNumber!;
 
       await _firestore
+          .collection('mechanic')
+          .doc(mechanicId)
           .collection("service_requests")
           .doc(chatRoomID)
           .set(newRequest.toMap());
