@@ -110,6 +110,9 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                           problemDescription: problemDescription,
                           year: widget.car.year!,
                           fuel: widget.car.fuel!);
+
+                      showSnackBar(context, "Sent message to the mechanic");
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

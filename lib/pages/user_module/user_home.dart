@@ -118,7 +118,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => MapPage(
-                              selectedService: 'isTowService',
+                              selectedService: 'isTowSelected',
                               serviceName: 'Tow Service',
                             ),
                           ),

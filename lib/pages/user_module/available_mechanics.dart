@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/mechanic_model.dart';
 import '../../providers/chat_services.dart';
+import '../../utils/colors.dart';
 import '../../utils/user_tile.dart';
 import 'user_messaging.dart';
 
@@ -48,13 +49,13 @@ class _NearbyMechanicsScreenState extends State<NearbyMechanicsScreen> {
             ),
             child: AppBar(
               automaticallyImplyLeading: true,
-              // title: Text(
-              //   widget.serviceName,
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.bold,
-              //       color: secondaryColor),
-              // ),
+              title: Text(
+                "Available mechanics",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: secondaryColor),
+              ),
               elevation: 0, // Remove AppBar's default elevation
             ),
           )),
