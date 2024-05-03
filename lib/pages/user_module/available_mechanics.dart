@@ -58,7 +58,7 @@ class _NearbyMechanicsScreenState extends State<NearbyMechanicsScreen> {
               elevation: 0, // Remove AppBar's default elevation
             ),
           )),
-      body: _buildUserList(),
+      body: Column(children: [_buildUserList()]),
       //LaterUse(),
     );
   }
@@ -75,11 +75,14 @@ class _NearbyMechanicsScreenState extends State<NearbyMechanicsScreen> {
             return const Text("Loading");
           }
 
-          return ListView(
-            children: snapshot.data!
-                .map<Widget>(
-                    (userData) => _buildUserListItem(userData, context))
-                .toList(),
+          return Container(
+            height: 300,
+            child: ListView(
+              children: snapshot.data!
+                  .map<Widget>(
+                      (userData) => _buildUserListItem(userData, context))
+                  .toList(),
+            ),
           );
         });
   }
