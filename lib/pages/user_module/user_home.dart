@@ -1,12 +1,15 @@
 // ignore_for_file: prefer_const_constructors, library_prefixes, unnecessary_string_interpolations, prefer_const_literals_to_create_immutables
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/map_pages.dart';
-import 'package:first/pages/user_module/available_mechanics.dart';
+import 'package:first/pages/user_module/user_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
 import '../../models/user_models.dart';
+import '../../providers/chat_services.dart';
+import '../../utils/user_tile.dart';
 import 'user_cards/chat_bot.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/colors.dart';
@@ -131,21 +134,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),
                   ],
                 ),
-                GestureDetector(
-                  child: UserCard(
-                    name: "Text Mechanics",
-                    svgPath: 'assets/message.svg',
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NearbyMechanicsScreen(
-                              selectedService: "is4WheelRepairSelected",
-                              serviceName: "4 - wheel assist")),
-                    );
-                  },
+                SizedBox(
+                  height: 8,
                 ),
+                _buildUserList()
               ],
             ),
           ),
@@ -166,6 +158,55 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       ),
       floatingActionButtonLocation: MiddleRightFloatingActionButtonLocation(),
     );
+  }
+}
+
+Widget _buildUserList() {
+  final ChatService chatService = ChatService();
+
+  return StreamBuilder(
+      stream: chatService.getSelectedMechanicStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text("Error");
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text("Loading");
+        }
+
+        return SizedBox(
+          height: 180,
+          child: ListView(
+            children: snapshot.data!
+                .map<Widget>(
+                    (userData) => _buildUserListItem(userData, context))
+                .toList(),
+          ),
+        );
+      });
+}
+
+Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  if (userData["email"] != auth.currentUser?.email) {
+    return UserTile(
+      text: userData["name"],
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+                receiverEmail: userData["email"],
+                receiverID: userData["uid"],
+                profilePic: userData["profilePic"]),
+          ),
+        );
+      },
+    );
+  } else {
+    return Container();
   }
 }
 

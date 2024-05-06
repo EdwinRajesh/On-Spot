@@ -16,13 +16,19 @@ class ChatService {
 
   ChatService();
 
-  Stream<List<Map<String, dynamic>>> getMechanicsStream(selectedService) {
+  Stream<List<Map<String, dynamic>>> getMechanicsStream(
+      String selectedService) {
     return _firestore.collection("mechanic").snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final user = doc.data();
+      return snapshot.docs
+          .where((doc) => doc.data()[selectedService] == true)
+          .map((doc) => doc.data())
+          .toList();
+    });
+  }
 
-        return user;
-      }).toList();
+  Stream<List<Map<String, dynamic>>> getSelectedMechanicStream() {
+    return _firestore.collection("mechanic").snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => doc.data()).toList();
     });
   }
 
