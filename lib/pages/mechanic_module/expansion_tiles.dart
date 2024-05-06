@@ -2,8 +2,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:first/utils/icon_button.dart';
-import 'package:first/utils/tertiary_button.dart';
 import 'package:flutter/material.dart';
+import '../../utils/tertiary_button.dart';
 import 'mechanic_map.dart';
 import '../../utils/colors.dart';
 
@@ -142,14 +142,6 @@ class ExpandedTiles extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    TertiaryButton(
-                        text: "Accept",
-                        onPressed: () {},
-                        foreground: secondaryColor,
-                        background: primaryColor),
-                    SizedBox(
-                      width: 8,
-                    ),
                     TertiaryButton(
                         text: "Reject",
                         onPressed: () {},

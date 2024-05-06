@@ -173,7 +173,7 @@ Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
         return const Text("Loading");
       }
 
-      return Container(
+      return SizedBox(
         height: 200,
         child: ListView(
           children: snapshot.data!

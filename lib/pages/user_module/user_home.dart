@@ -26,6 +26,8 @@ class UserHomeScreen extends StatefulWidget {
 class _UserHomeScreenState extends State<UserHomeScreen> {
   late UserModel _userModel;
   UserModel get userModel => _userModel;
+  FirebaseAuth auth = FirebaseAuth.instance;
+  final ChatService chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +139,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 SizedBox(
                   height: 8,
                 ),
-                _buildUserList()
+                _buildUserList(),
               ],
             ),
           ),
@@ -188,26 +190,40 @@ Widget _buildUserList() {
 }
 
 Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
-  FirebaseAuth auth = FirebaseAuth.instance;
+  final ChatService chatService = ChatService();
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  if (userData["email"] != auth.currentUser?.email) {
-    return UserTile(
-      text: userData["name"],
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatPage(
-                receiverEmail: userData["email"],
-                receiverID: userData["uid"],
-                profilePic: userData["profilePic"]),
-          ),
-        );
-      },
-    );
-  } else {
-    return Container();
-  }
+  return FutureBuilder<List<String>>(
+    future: chatService.getMechanicUIDs(auth.currentUser!.phoneNumber!),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator();
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else {
+        List<String> mechanicUIDs = snapshot.data!;
+        if (mechanicUIDs.contains(userData["phoneNumber"])) {
+          return UserTile(
+            text: userData["name"],
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(
+                    receiverEmail: userData["email"],
+                    receiverID: userData["uid"],
+                    profilePic: userData["profilePic"],
+                  ),
+                ),
+              );
+            },
+          );
+        } else {
+          return Container();
+        }
+      }
+    },
+  );
 }
 
 class MiddleRightFloatingActionButtonLocation

@@ -45,119 +45,122 @@ class ExpandedTiles extends StatelessWidget {
       return text[0].toUpperCase() + text.substring(1);
     }
 
-    return Container(
-      decoration: BoxDecoration(
-          color: secondaryColor, borderRadius: BorderRadius.circular(8)),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
-        leading: CircleAvatar(
-          radius: 20, // Adjust the size of the circle avatar as needed
-          backgroundImage:
-              NetworkImage(userProfilePicture), // Provide the image URL
-        ),
-        title: Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Container(
+        decoration: BoxDecoration(
+            color: secondaryColor, borderRadius: BorderRadius.circular(8)),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+          leading: CircleAvatar(
+            radius: 20, // Adjust the size of the circle avatar as needed
+            backgroundImage:
+                NetworkImage(userProfilePicture), // Provide the image URL
+          ),
+          title: Row(
+            children: [
+              SizedBox(width: 10),
+              Text(
+                userName,
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
           children: [
-            SizedBox(width: 10),
-            Text(
-              userName,
-              style: TextStyle(
-                color: primaryColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Image.network(
+                        picture, // Display the first picture in the list
+                        width: 70,
+                        height: 100,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        width: 16,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                capitalizeFirstLetter(manufacture),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 18),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                capitalizeFirstLetter(model),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 18),
+                              )
+                            ],
+                          ),
+                          //Text('Reg. No : ${car.}'),
+                          Text(
+                            year,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                customIcon,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                fuel,
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Text(
+                    problemDescription,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  IconButtonWidget(
+                    icon: Icon(Icons.location_pin),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MechanicMap(
+                                  latitude: latitude,
+                                  longitude: longitude,
+                                )),
+                      );
+                    },
+                    foreground: secondaryColor,
+                    background: primaryColor,
+                  )
+                ],
               ),
             ),
           ],
         ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Image.network(
-                      picture, // Display the first picture in the list
-                      width: 70,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              capitalizeFirstLetter(manufacture),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 18),
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Text(
-                              capitalizeFirstLetter(model),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 18),
-                            )
-                          ],
-                        ),
-                        //Text('Reg. No : ${car.}'),
-                        Text(
-                          year,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              customIcon,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              fuel,
-                              style: TextStyle(color: Colors.white),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Text(
-                  problemDescription,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ),
-                IconButtonWidget(
-                  icon: Icon(Icons.location_pin),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MechanicMap(
-                                latitude: latitude,
-                                longitude: longitude,
-                              )),
-                    );
-                  },
-                  foreground: secondaryColor,
-                  background: primaryColor,
-                )
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

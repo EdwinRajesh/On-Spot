@@ -32,6 +32,29 @@ class ChatService {
     });
   }
 
+  Future<List<String>> getMechanicUIDs(String userPhoneNumber) async {
+    final List<String> mechanicUIDs = [];
+    print("Current user phone numbr $userPhoneNumber");
+
+    final QuerySnapshot<Map<String, dynamic>> mechanicsSnapshot =
+        await FirebaseFirestore.instance.collection('mechanic').get();
+
+    for (final mechanicDoc in mechanicsSnapshot.docs) {
+      final QuerySnapshot<Map<String, dynamic>> serviceRequestsSnapshot =
+          await mechanicDoc.reference.collection('service_requests').get();
+
+      for (final serviceRequestDoc in serviceRequestsSnapshot.docs) {
+        final String carId = serviceRequestDoc.id;
+        if (carId == userPhoneNumber) {
+          mechanicUIDs.add(mechanicDoc.id);
+          break; // Once a match is found, no need to check further for this mechanic
+        }
+      }
+    }
+
+    return mechanicUIDs;
+  }
+
   Stream<List<Map<String, dynamic>>> getUserStream() {
     return _firestore.collection("users").snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
