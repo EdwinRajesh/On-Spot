@@ -1,20 +1,18 @@
-// ignore_for_file: avoid_unnecessary_containers
-
 import 'package:flutter/material.dart';
 
-class TertiaryButton extends StatelessWidget {
+class IconButtonWidget extends StatelessWidget {
   // final double height;
   // final double width;
-  final String text;
+  final Icon icon;
   final VoidCallback onPressed;
   final Color foreground;
   final Color background;
-  const TertiaryButton({
+  const IconButtonWidget({
     super.key,
-    required this.text,
     required this.onPressed,
     required this.foreground,
     required this.background,
+    required this.icon,
   });
 
   @override
@@ -30,10 +28,7 @@ class TertiaryButton extends StatelessWidget {
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)))),
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 14),
-          )),
+          child: icon),
     );
   }
 }

@@ -1,9 +1,9 @@
 //import 'package:flutter/foundation.dart';
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:ui';
-
+import 'package:first/utils/icon_button.dart';
 import 'package:flutter/material.dart';
+import '../pages/mechanic_module/mechanic_map.dart';
 import 'colors.dart';
 
 class ExpandedTiles extends StatelessWidget {
@@ -12,6 +12,8 @@ class ExpandedTiles extends StatelessWidget {
   final String text;
   final String fuel;
   final String year;
+  final double latitude;
+  final double longitude;
   final String model;
   final String picture;
   final String manufacture;
@@ -28,6 +30,8 @@ class ExpandedTiles extends StatelessWidget {
     required this.picture,
     required this.manufacture,
     required this.problemDescription,
+    required this.latitude,
+    required this.longitude,
   });
 
   @override
@@ -134,6 +138,21 @@ class ExpandedTiles extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold),
+                ),
+                IconButtonWidget(
+                  icon: Icon(Icons.location_pin),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MechanicMap(
+                                latitude: latitude,
+                                longitude: longitude,
+                              )),
+                    );
+                  },
+                  foreground: secondaryColor,
+                  background: primaryColor,
                 )
               ],
             ),

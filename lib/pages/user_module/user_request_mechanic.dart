@@ -6,6 +6,8 @@ import 'package:first/utils/secondary.dart';
 import 'package:first/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 import '../../models/car_model.dart';
 
@@ -101,6 +103,7 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                   text: 'Send Message',
                   onPressed: () async {
                     try {
+                      LatLng? position = await _getLocationUpdate();
                       ChatService chatService = ChatService();
                       await chatService.sendServiceRequest(
                           mechanicId: widget.mechanic['uid'],
@@ -109,7 +112,9 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                           carId: widget.car.uid!,
                           problemDescription: problemDescription,
                           year: widget.car.year!,
-                          fuel: widget.car.fuel!);
+                          fuel: widget.car.fuel!,
+                          latitude: position?.latitude ?? 0.0,
+                          longitude: position?.longitude ?? 0.0);
 
                       showSnackBar(context, "Sent message to the mechanic");
 
@@ -130,5 +135,34 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
         ),
       ),
     );
+  }
+
+  Future<LatLng?> _getLocationUpdate() async {
+    final Location locationController = Location();
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    serviceEnabled = await locationController.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationController.requestService();
+    }
+
+    permissionGranted = await locationController.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationController.requestPermission();
+    }
+
+    if (permissionGranted == PermissionStatus.granted) {
+      return await locationController.onLocationChanged
+          .map((LocationData currentLocation) {
+        if (currentLocation.latitude != null &&
+            currentLocation.longitude != null) {
+          return LatLng(currentLocation.latitude!, currentLocation.longitude!);
+        }
+        return null;
+      }).first;
+    }
+
+    return null; // Return null if location permission is not granted
   }
 }

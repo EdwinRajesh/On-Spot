@@ -108,7 +108,7 @@ Widget _buildUserRequestList(ChatService chatService, FirebaseAuth auth) {
 
       // Build the list of user request items
       return Container(
-        height: 200,
+        height: 250,
         child: ListView(
           children: (snapshot.data as List).map<Widget>((userData) {
             return _buildUserRequestListItem(userData, context);
@@ -136,7 +136,11 @@ Widget _buildUserRequestListItem(
           Map<String, dynamic> userCarData =
               (snapshot.data!.data() as Map<String, dynamic>);
           String userName = userCarData['name'];
+          double latitude = (userData['latitude'] as double?) ?? 0.0;
+          double longitude = (userData['longitude'] as double?) ?? 0.0;
           return ExpandedTiles(
+              longitude: longitude, // Convert to double or use default value
+              latitude: latitude,
               userProfilePicture: userCarData['profilePic'] ?? "",
               userName: userName,
               text: userData['carId'],

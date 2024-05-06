@@ -2,6 +2,8 @@ class ServiceRequest {
   final String problemDescription;
   final String picture;
   final String carId;
+  final double? latitude; // Add latitude field
+  final double? longitude;
   final String model;
   final String mechanicId;
   final String fuel;
@@ -9,6 +11,8 @@ class ServiceRequest {
   final String manufacture;
 
   ServiceRequest({
+    required this.latitude,
+    required this.longitude,
     required this.fuel,
     required this.year,
     required this.picture,
@@ -21,6 +25,8 @@ class ServiceRequest {
 
   Map<String, dynamic> toMap() {
     return {
+      'latitude': longitude,
+      'longitude': latitude,
       'problemDescription': problemDescription,
       'picture': picture,
       'fuel': fuel,

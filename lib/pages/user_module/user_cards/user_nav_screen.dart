@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 //import 'package:on_spot_mechanic/utils/colors.dart';
 import 'package:line_icons/line_icons.dart';
 
+import '../../../models/user_models.dart';
 import '../../../utils/colors.dart';
 import '../user_home.dart';
 import '../user_profile.dart';
@@ -20,6 +21,9 @@ class UserNavPage extends StatefulWidget {
 }
 
 class _UserNavPageState extends State<UserNavPage> {
+  UserModel get userModel => _userModel;
+
+  late UserModel _userModel;
   int currentPageIndex = 1;
   int _selectedIndex = 1;
   static const List<Widget> _widgetOptions = <Widget>[
