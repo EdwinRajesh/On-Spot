@@ -12,21 +12,26 @@ class FaqPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'FAQ',
-          style: TextStyle(
-              color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: secondaryColor,
-        elevation: 0,
-        centerTitle: true,
-        flexibleSpace: Container(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [primaryColor, secondaryColor],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1), // Shadow color
+                spreadRadius: 2, // Spread radius
+                blurRadius: 4, // Blur radius
+                offset: Offset(0, 2), // Offset in the y direction
+              ),
+            ],
+          ),
+          child: AppBar(
+            title: Text(
+              'FAQ',
+              style: TextStyle(
+                  color: secondaryColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -41,12 +46,6 @@ class FaqPage extends StatelessWidget {
                 'WE ARE HERE TO HELP',
                 style: textTheme.headlineLarge
                     ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 32.0),
-              Text(
-                'FAQ',
-                style:
-                    textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16.0),
               ExpansionTile(

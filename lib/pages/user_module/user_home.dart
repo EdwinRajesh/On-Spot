@@ -213,6 +213,7 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
                     receiverEmail: userData["email"],
                     receiverID: userData["uid"],
                     profilePic: userData["profilePic"],
+                    receiverName: userData['name'],
                   ),
                 ),
               );

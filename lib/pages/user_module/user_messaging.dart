@@ -13,12 +13,14 @@ class ChatPage extends StatelessWidget {
   final String receiverEmail;
   final String receiverID;
   final String profilePic;
+  final String receiverName;
 
   ChatPage(
       {super.key,
       required this.receiverEmail,
       required this.receiverID,
-      required this.profilePic});
+      required this.profilePic,
+      required this.receiverName});
 
   final TextEditingController _messageController = TextEditingController();
 
@@ -46,7 +48,7 @@ class ChatPage extends StatelessWidget {
             SizedBox(
               width: 8,
             ),
-            Text(receiverEmail),
+            Text(receiverName),
           ],
         ),
         backgroundColor: secondaryColor,

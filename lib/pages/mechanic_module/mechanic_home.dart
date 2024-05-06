@@ -1,8 +1,8 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element
+// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element, prefer_const_constructors_in_immutables
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first/pages/mechanic_module/expand_tile.dart';
 import 'package:first/pages/mechanic_module/mechanic_profile.dart';
-import 'package:first/utils/expansion_tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -138,7 +138,7 @@ Widget _buildUserRequestListItem(
           String userName = userCarData['name'];
           double latitude = (userData['latitude'] as double?) ?? 0.0;
           double longitude = (userData['longitude'] as double?) ?? 0.0;
-          return ExpandedTiles(
+          return MechanicNotification(
               longitude: longitude, // Convert to double or use default value
               latitude: latitude,
               userProfilePicture: userCarData['profilePic'] ?? "",
@@ -196,10 +196,10 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
-              profilePic: userData['profilePic'],
-              receiverEmail: userData["email"],
-              receiverID: userData["uid"],
-            ),
+                profilePic: userData['profilePic'],
+                receiverEmail: userData["email"],
+                receiverID: userData["uid"],
+                receiverName: userData['name']),
           ),
         );
       },
