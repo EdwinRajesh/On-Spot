@@ -1,13 +1,18 @@
 //import 'package:flutter/foundation.dart';
 // ignore_for_file: prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/utils/icon_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import '../../providers/chat_services.dart';
 import '../../utils/tertiary_button.dart';
+import '../../utils/utils.dart';
 import 'mechanic_map.dart';
 import '../../utils/colors.dart';
 
-class MechanicNotification extends StatelessWidget {
+class MechanicNotification extends StatefulWidget {
   final String userName;
   final String userProfilePicture;
   final String text;
@@ -15,6 +20,9 @@ class MechanicNotification extends StatelessWidget {
   final String year;
   final double latitude;
   final double longitude;
+  final String profilePic;
+  final String mechanicName;
+  final String? mechanicId;
   final String model;
   final String picture;
   final String manufacture;
@@ -33,10 +41,43 @@ class MechanicNotification extends StatelessWidget {
     required this.problemDescription,
     required this.latitude,
     required this.longitude,
+    required this.profilePic,
+    required this.mechanicName,
+    required this.mechanicId,
   });
 
   @override
+  State<MechanicNotification> createState() => _MechanicNotificationState();
+}
+
+class _MechanicNotificationState extends State<MechanicNotification> {
+  bool _rejected = false;
+  bool _acceptButtonClicked = false;
+  FirebaseAuth auth = FirebaseAuth.instance;
+  void _handleButtonClick(bool isAccepted) {
+    setState(() {
+      if (isAccepted) {
+        _acceptButtonClicked = true;
+      } else {
+        _rejected = true;
+      }
+    });
+
+    // Perform any additional actions based on the button click (accepted or rejected)
+    if (isAccepted) {
+      // Handle accept button click
+    } else {
+      // Handle reject button click
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_rejected) {
+      // If rejected, return an empty container or any other widget you want to display
+      return Container();
+    }
+
     IconData customIcon = IconData(0xea8e, fontFamily: 'MaterialIcons');
 
     String capitalizeFirstLetter(String text) {
@@ -55,14 +96,14 @@ class MechanicNotification extends StatelessWidget {
           tilePadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
           leading: CircleAvatar(
             radius: 20, // Adjust the size of the circle avatar as needed
-            backgroundImage:
-                NetworkImage(userProfilePicture), // Provide the image URL
+            backgroundImage: NetworkImage(
+                widget.userProfilePicture), // Provide the image URL
           ),
           title: Row(
             children: [
               SizedBox(width: 10),
               Text(
-                userName,
+                widget.userName,
                 style: TextStyle(
                   color: primaryColor,
                   fontSize: 18,
@@ -79,7 +120,7 @@ class MechanicNotification extends StatelessWidget {
                   Row(
                     children: [
                       Image.network(
-                        picture, // Display the first picture in the list
+                        widget.picture, // Display the first picture in the list
                         width: 70,
                         height: 100,
                         fit: BoxFit.contain,
@@ -93,7 +134,7 @@ class MechanicNotification extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                capitalizeFirstLetter(manufacture),
+                                capitalizeFirstLetter(widget.manufacture),
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -103,7 +144,7 @@ class MechanicNotification extends StatelessWidget {
                                 width: 8,
                               ),
                               Text(
-                                capitalizeFirstLetter(model),
+                                capitalizeFirstLetter(widget.model),
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -113,7 +154,7 @@ class MechanicNotification extends StatelessWidget {
                           ),
                           //Text('Reg. No : ${car.}'),
                           Text(
-                            year,
+                            widget.year,
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white,
@@ -126,7 +167,7 @@ class MechanicNotification extends StatelessWidget {
                                 color: Colors.white,
                               ),
                               Text(
-                                fuel,
+                                widget.fuel,
                                 style: TextStyle(color: Colors.white),
                               )
                             ],
@@ -136,7 +177,7 @@ class MechanicNotification extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    problemDescription,
+                    widget.problemDescription,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -144,37 +185,64 @@ class MechanicNotification extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      TertiaryButton(
-                          text: "Reject",
-                          onPressed: () {},
-                          foreground: secondaryColor,
-                          background: Colors.red),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      TertiaryButton(
-                          text: "Accept",
-                          onPressed: () {},
-                          foreground: secondaryColor,
-                          background: primaryColor),
-                      SizedBox(
-                        width: 8,
-                      ),
                       IconButtonWidget(
                         icon: Icon(Icons.location_pin),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MechanicMap(
-                                      latitude: latitude,
-                                      longitude: longitude,
-                                    )),
+                              builder: (context) => MechanicMap(
+                                latitude: widget.latitude,
+                                longitude: widget.longitude,
+                              ),
+                            ),
                           );
                         },
                         foreground: secondaryColor,
                         background: primaryColor,
                       ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      if (!_acceptButtonClicked)
+                        Row(
+                          children: [
+                            TertiaryButton(
+                              text: "Reject",
+                              onPressed: () => _handleButtonClick(false),
+                              foreground: secondaryColor,
+                              background: Colors.red,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            TertiaryButton(
+                              text: "Accept",
+                              onPressed: () async {
+                                _handleButtonClick(true);
+                                try {
+                                  LatLng? position = await _getLocationUpdate();
+                                  ChatService chatService = ChatService();
+                                  await chatService.SendMechanicResponse(
+                                      mechanicId: auth.currentUser!.uid,
+                                      longitude: position?.longitude ?? 0.0,
+                                      latitude: position?.latitude ?? 0.0,
+                                      profilePic: widget.userProfilePicture,
+                                      name: widget.mechanicName);
+                                  showSnackBar(context,
+                                      "Send notificaton to ${widget.userName}");
+                                } catch (error) {
+                                  showSnackBar(context, error.toString());
+                                }
+                              },
+                              foreground: secondaryColor,
+                              background: primaryColor,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                          ],
+                        ),
                     ],
                   )
                 ],
@@ -184,5 +252,34 @@ class MechanicNotification extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<LatLng?> _getLocationUpdate() async {
+    final Location locationController = Location();
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    serviceEnabled = await locationController.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationController.requestService();
+    }
+
+    permissionGranted = await locationController.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationController.requestPermission();
+    }
+
+    if (permissionGranted == PermissionStatus.granted) {
+      return await locationController.onLocationChanged
+          .map((LocationData currentLocation) {
+        if (currentLocation.latitude != null &&
+            currentLocation.longitude != null) {
+          return LatLng(currentLocation.latitude!, currentLocation.longitude!);
+        }
+        return null;
+      }).first;
+    }
+
+    return null; // Return null if location permission is not granted
   }
 }

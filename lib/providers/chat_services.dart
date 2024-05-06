@@ -6,6 +6,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first/models/mechanic_accept_model.dart';
 
 import '../models/message_model.dart';
 import '../models/request_model.dart';
@@ -88,6 +89,34 @@ class ChatService {
       // Handle errors
       print('Error retrieving service requests: $error');
       return Stream.empty(); // Return an empty stream in case of error
+    }
+  }
+
+  Future<void> SendMechanicResponse({
+    required String mechanicId,
+    required double longitude,
+    required double latitude,
+    required String profilePic,
+    required String name,
+  }) async {
+    final User? currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      MechanicResponse mechanicResponse = MechanicResponse(
+          longitude: longitude,
+          mechanicId: mechanicId,
+          profilePic: profilePic,
+          name: name,
+          latitude: latitude);
+      String chatRoomID = currentUser.phoneNumber!;
+
+      await _firestore
+          .collection('mechanic_response')
+          .doc(chatRoomID)
+          .set(mechanicResponse.toMap());
+    } else {
+      // Handle the case when the current user is null
+      print("Error: Current user is null");
+      // You can also show an error message to the user or take appropriate action
     }
   }
 
