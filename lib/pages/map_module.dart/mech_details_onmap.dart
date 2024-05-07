@@ -64,12 +64,12 @@ class MechanicDetailsPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 21.0),
-                Expanded(
-                  child: SecondaryButton(
-                    onPressed: () {},
-                    text: 'Book Schedule',
-                  ),
-                ),
+                // Expanded(
+                //   child: SecondaryButton(
+                //     onPressed: () {},
+                //     text: 'Book Schedule',
+                //   ),
+                // ),
               ],
             ),
           ],

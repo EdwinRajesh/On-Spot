@@ -92,16 +92,18 @@ class _MapPageState extends State<MapPage> {
                           markers: {
                             if (currentposition != null)
                               Marker(
-                                markerId: const MarkerId("currentLocation"),
-                                icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    BitmapDescriptor.hueGreen),
-                                position: currentposition!,
-                              ),
+                                  markerId: const MarkerId("currentLocation"),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      BitmapDescriptor.hueGreen),
+                                  position: currentposition!,
+                                  infoWindow: InfoWindow(
+                                      title: 'You are currently here')),
                             for (int i = 0; i < mechanicLocations.length; i++)
                               Marker(
                                 markerId: MarkerId(
                                     i.toString()), // Use the index as marker ID
                                 position: mechanicLocations[i],
+                                infoWindow: InfoWindow(title: 'Mechanic'),
                                 icon: BitmapDescriptor.defaultMarkerWithHue(
                                   BitmapDescriptor.hueRed,
                                 ),

@@ -108,17 +108,17 @@ class _OtpScreenState extends State<OtpScreen> {
                             ),
                           ),
                           SizedBox(height: 24),
-                          Text('Didn\'t receive any code?',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black38)),
-                          SizedBox(height: 24),
-                          Text('Resend new code',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryColor)),
+                          // Text('Didn\'t receive any code?',
+                          //     style: TextStyle(
+                          //         fontSize: 14,
+                          //         fontWeight: FontWeight.bold,
+                          //         color: Colors.black38)),
+                          // SizedBox(height: 24),
+                          // Text('Resend new code',
+                          //     style: TextStyle(
+                          //         fontSize: 16,
+                          //         fontWeight: FontWeight.bold,
+                          //         color: primaryColor)),
                         ],
                       ),
                     ),
