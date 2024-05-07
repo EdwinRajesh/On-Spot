@@ -138,7 +138,11 @@ Widget _buildUserRequestListItem(
           String userName = userCarData['name'];
           double latitude = (userData['latitude'] as double?) ?? 0.0;
           double longitude = (userData['longitude'] as double?) ?? 0.0;
+          final ap = Provider.of<AuthorizationProvider>(context, listen: false);
           return MechanicNotification(
+              profilePic: ap.mechanicModel.profilePic,
+              mechanicName: ap.mechanicModel.name,
+              mechanicId: ap.mechanicModel.phoneNumber,
               longitude: longitude, // Convert to double or use default value
               latitude: latitude,
               userProfilePicture: userCarData['profilePic'] ?? "",
