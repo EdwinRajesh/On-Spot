@@ -1,31 +1,27 @@
-// ignore_for_file: unnecessary_import, prefer_const_constructors
-
+//import 'dart:convert';
+import 'package:first/pages/user_module/notifi.dart';
 import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
-import 'package:first/providers/chat_services.dart';
-import 'package:first/utils/secondary.dart';
-import 'package:first/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-
 import '../../models/car_model.dart';
+import '../../providers/chat_services.dart';
+import '../../utils/secondary.dart';
+import '../../utils/utils.dart';
+//import 'notif.dart';
 
 class UserRequestMechanic extends StatefulWidget {
   final CarModel car;
   final Map<String, dynamic> mechanic;
-  // Add a field to store the selected car
 
-  const UserRequestMechanic(
-      {required this.car, super.key, required this.mechanic});
+  const UserRequestMechanic({required this.car, required this.mechanic});
 
   @override
   State<UserRequestMechanic> createState() => _UserRequestMechanicState();
 }
 
 class _UserRequestMechanicState extends State<UserRequestMechanic> {
-  String problemDescription =
-      ''; // Add a variable to store the problem description
+  String problemDescription = '';
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +42,10 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                 ),
                 SizedBox(height: 8),
                 TextFormField(
-                  maxLines: 4, // Adjust the number of lines as needed
+                  maxLines: 4,
                   onChanged: (value) {
                     setState(() {
-                      problemDescription =
-                          value; // Update the problem description
+                      problemDescription = value;
                     });
                   },
                   decoration: InputDecoration(
@@ -106,15 +101,26 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                       LatLng? position = await _getLocationUpdate();
                       ChatService chatService = ChatService();
                       await chatService.sendServiceRequest(
-                          mechanicId: widget.mechanic['uid'],
-                          carName: widget.car.model,
-                          picture: widget.car.carPictures[0],
-                          carId: widget.car.uid!,
-                          problemDescription: problemDescription,
-                          year: widget.car.year!,
-                          fuel: widget.car.fuel!,
-                          latitude: position?.latitude ?? 0.0,
-                          longitude: position?.longitude ?? 0.0);
+                        mechanicId: widget.mechanic['uid'],
+                        carName: widget.car.model,
+                        picture: widget.car.carPictures[0],
+                        carId: widget.car.uid!,
+                        problemDescription: problemDescription,
+                        year: widget.car.year!,
+                        fuel: widget.car.fuel!,
+                        latitude: position?.latitude ?? 0.0,
+                        longitude: position?.longitude ?? 0.0,
+                      );
+
+                      // Send notification to the mechanic
+                      NotificationServices notificationServices = NotificationServices();
+                      await notificationServices.sendNotificationToMechanic(
+                        widget.mechanic['uid'],
+                        'ON-SPOT MECHANIC',
+                        'Need Assistance!',
+                      );
+
+                      
 
                       showSnackBar(context, "Sent message to the mechanic");
 
@@ -136,6 +142,7 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
       ),
     );
   }
+  
 
   Future<LatLng?> _getLocationUpdate() async {
     final Location locationController = Location();
@@ -163,6 +170,6 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
       }).first;
     }
 
-    return null; // Return null if location permission is not granted
+    return null;
   }
 }
