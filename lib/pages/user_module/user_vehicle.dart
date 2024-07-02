@@ -99,7 +99,10 @@ class _UserVehiclePageState extends State<UserVehiclePage> {
                 future: ap.getCarDataFromFirestore(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ));
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {

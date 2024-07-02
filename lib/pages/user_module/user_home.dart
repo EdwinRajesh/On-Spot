@@ -174,12 +174,21 @@ Widget _buildUserList() {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text("Loading");
+          return Center(
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
+            ),
+          );
         }
 
         return SizedBox(
           height: 180,
           child: ListView(
+            padding: EdgeInsets.zero,
             children: snapshot.data!
                 .map<Widget>(
                     (userData) => _buildUserListItem(userData, context))
@@ -197,7 +206,7 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
     future: chatService.getMechanicUIDs(auth.currentUser!.phoneNumber!),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return CircularProgressIndicator();
+        return SizedBox.shrink();
       } else if (snapshot.hasError) {
         return Text('Error: ${snapshot.error}');
       } else {

@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../../models/car_model.dart';
+import '../../utils/colors.dart';
 
 class UserRequestMechanic extends StatefulWidget {
   final CarModel car;
@@ -24,116 +25,156 @@ class UserRequestMechanic extends StatefulWidget {
 }
 
 class _UserRequestMechanicState extends State<UserRequestMechanic> {
+  bool _isLoading = false;
   String problemDescription =
       ''; // Add a variable to store the problem description
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Request Mechanic'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Describe the problem with the vehicle:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  maxLines: 4, // Adjust the number of lines as needed
-                  onChanged: (value) {
-                    setState(() {
-                      problemDescription =
-                          value; // Update the problem description
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Enter problem description...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                ListTile(
-                  leading: widget.car.carPictures.isNotEmpty
-                      ? Image.network(
-                          widget.car.carPictures[0],
-                          width: 100,
-                          height: 320,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(Icons.car_repair),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.car.manufacture,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        widget.car.model,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text('Year: ${widget.car.year}',
-                          style: TextStyle(fontSize: 16)),
-                      Row(
-                        children: [
-                          Icon(Icons.local_gas_station),
-                          Text(widget.car.fuel!),
+    return Center(
+      child: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
+            )
+          : Scaffold(
+              appBar: PreferredSize(
+                  preferredSize: Size.fromHeight(kToolbarHeight),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Colors.black.withOpacity(0.1), // Shadow color
+                            spreadRadius: 2, // Spread radius
+                            blurRadius: 4, // Blur radius
+                            offset: Offset(0, 2), // Offset in the y direction
+                          ),
                         ],
                       ),
-                    ],
+                      child: AppBar(
+                        title: Text("Request Mechanic",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: secondaryColor)),
+                        leading: GestureDetector(
+                          child: Icon(Icons.arrow_back),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        toolbarHeight: 32,
+                      ))),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Describe the problem with the vehicle:',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        TextFormField(
+                          maxLines: 4, // Adjust the number of lines as needed
+                          onChanged: (value) {
+                            setState(() {
+                              problemDescription =
+                                  value; // Update the problem description
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Enter problem description...',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        ListTile(
+                          leading: widget.car.carPictures.isNotEmpty
+                              ? Image.network(
+                                  widget.car.carPictures[0],
+                                  width: 100,
+                                  height: 320,
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(Icons.car_repair),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.car.manufacture,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                widget.car.model,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Text('Year: ${widget.car.year}',
+                                  style: TextStyle(fontSize: 16)),
+                              Row(
+                                children: [
+                                  Icon(Icons.local_gas_station),
+                                  Text(widget.car.fuel!),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 14,
+                        ),
+                        SecondaryButton(
+                          text: 'Send Message',
+                          onPressed: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            try {
+                              LatLng? position = await _getLocationUpdate();
+                              ChatService chatService = ChatService();
+                              await chatService.sendServiceRequest(
+                                  mechanicId: widget.mechanic['uid'],
+                                  carName: widget.car.model,
+                                  picture: widget.car.carPictures[0],
+                                  carId: widget.car.uid!,
+                                  problemDescription: problemDescription,
+                                  year: widget.car.year!,
+                                  fuel: widget.car.fuel!,
+                                  latitude: position?.latitude ?? 0.0,
+                                  longitude: position?.longitude ?? 0.0);
+
+                              showSnackBar(context,
+                                  " message successfully sent to the mechanic");
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserNavPage(index: 1),
+                                ),
+                              );
+                            } catch (error) {
+                              showSnackBar(
+                                  context, "message not sent try again");
+                            }
+                          },
+                        )
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(
-                  height: 14,
-                ),
-                SecondaryButton(
-                  text: 'Send Message',
-                  onPressed: () async {
-                    try {
-                      LatLng? position = await _getLocationUpdate();
-                      ChatService chatService = ChatService();
-                      await chatService.sendServiceRequest(
-                          mechanicId: widget.mechanic['uid'],
-                          carName: widget.car.model,
-                          picture: widget.car.carPictures[0],
-                          carId: widget.car.uid!,
-                          problemDescription: problemDescription,
-                          year: widget.car.year!,
-                          fuel: widget.car.fuel!,
-                          latitude: position?.latitude ?? 0.0,
-                          longitude: position?.longitude ?? 0.0);
-
-                      showSnackBar(context, "Sent message to the mechanic");
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserNavPage(index: 1),
-                        ),
-                      );
-                    } catch (error) {
-                      showSnackBar(context, error.toString());
-                    }
-                  },
-                )
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 

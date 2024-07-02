@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../../models/car_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/button.dart';
+import '../map_module.dart/mech_details_onmap.dart';
 
 class SendMechanicVehicle extends StatefulWidget {
   final Map<String, dynamic> mechanic;
@@ -51,9 +52,39 @@ class _SendMechanicVehicleState extends State<SendMechanicVehicle> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("My Vehicle"),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1), // Shadow color
+                    spreadRadius: 2, // Spread radius
+                    blurRadius: 4, // Blur radius
+                    offset: Offset(0, 2), // Offset in the y direction
+                  ),
+                ],
+              ),
+              child: AppBar(
+                title: Text("My Vehicles",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: secondaryColor)),
+                leading: GestureDetector(
+                  child: Icon(Icons.arrow_back),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MechanicDetailsPage(mechanic: widget.mechanic),
+                      ),
+                    );
+                  },
+                ),
+                toolbarHeight: 32,
+              ))),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
