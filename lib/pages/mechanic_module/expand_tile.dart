@@ -1,6 +1,7 @@
 //import 'package:flutter/foundation.dart';
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/utils/icon_button.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class _MechanicNotificationState extends State<MechanicNotification> {
   bool _rejected = false;
   bool _acceptButtonClicked = false;
   FirebaseAuth auth = FirebaseAuth.instance;
-  void _handleButtonClick(bool isAccepted) {
+  void _handleButtonClick(bool isAccepted) async {
     setState(() {
       if (isAccepted) {
         _acceptButtonClicked = true;
@@ -69,12 +70,24 @@ class _MechanicNotificationState extends State<MechanicNotification> {
     } else {
       // Handle reject button click
     }
+    if (_rejected) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('mechanic')
+            .doc(widget.mechanicId)
+            .collection('service_requests')
+            .doc(widget.text)
+            .delete();
+        showSnackBar(context, "Request rejected and document deleted.");
+      } catch (e) {
+        showSnackBar(context, "Error in deleting the request");
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_rejected) {
-      // If rejected, return an empty container or any other widget you want to display
       return Container();
     }
 

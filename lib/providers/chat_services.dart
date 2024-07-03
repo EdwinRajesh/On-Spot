@@ -122,8 +122,8 @@ class ChatService {
 
   Future<void> sendServiceRequest(
       {required String mechanicId,
-      required double longitude,
       required double latitude,
+      required double longitude,
       required String carName,
       required String picture,
       required String carId,
@@ -142,8 +142,8 @@ class ChatService {
         fuel: fuel,
         manufacture: fuel,
         picture: picture,
-        latitude: latitude,
-        longitude: longitude,
+        latitude: longitude,
+        longitude: latitude,
       );
 
       String chatRoomID = currentUser.phoneNumber!;

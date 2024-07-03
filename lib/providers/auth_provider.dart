@@ -273,23 +273,18 @@ class AuthorizationProvider extends ChangeNotifier {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Get the first matching document (assuming there's only one match)
         DocumentSnapshot carDocSnapshot = querySnapshot.docs.first;
 
-        // Delete the car document
         await carDocSnapshot.reference.delete();
 
-        // Return true if deletion is successful
         return true;
       } else {
         print('No matching car found for deletion');
         return false;
       }
     } catch (e) {
-      // Print the error message if an error occurs
       print('Error deleting car: $e');
 
-      // Return false if an error occurs
       return false;
     }
   }
