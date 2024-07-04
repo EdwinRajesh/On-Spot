@@ -98,6 +98,7 @@ class ChatService {
     required double latitude,
     required String profilePic,
     required String name,
+    required String userId,
   }) async {
     final User? currentUser = _auth.currentUser;
     if (currentUser != null) {
@@ -106,11 +107,14 @@ class ChatService {
           mechanicId: mechanicId,
           profilePic: profilePic,
           name: name,
-          latitude: latitude);
+          latitude: latitude,
+          userId: userId);
       String chatRoomID = currentUser.phoneNumber!;
 
       await _firestore
-          .collection('mechanic_response')
+          .collection('mechanic')
+          .doc(mechanicId)
+          .collection("request_accept")
           .doc(chatRoomID)
           .set(mechanicResponse.toMap());
     } else {

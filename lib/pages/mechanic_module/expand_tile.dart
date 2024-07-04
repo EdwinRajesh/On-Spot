@@ -66,9 +66,19 @@ class _MechanicNotificationState extends State<MechanicNotification> {
 
     // Perform any additional actions based on the button click (accepted or rejected)
     if (isAccepted) {
-      // Handle accept button click
-    } else {
-      // Handle reject button click
+      try {
+        ChatService chatService = ChatService();
+        await chatService.SendMechanicResponse(
+            mechanicId: widget.mechanicId!,
+            longitude: widget.longitude,
+            latitude: widget.latitude,
+            profilePic: widget.profilePic,
+            name: widget.mechanicName,
+            userId: widget.text);
+        showSnackBar(context, "user request accepted");
+      } catch (error) {
+        showSnackBar(context, "message not sent try again");
+      }
     }
     if (_rejected) {
       try {
@@ -78,7 +88,7 @@ class _MechanicNotificationState extends State<MechanicNotification> {
             .collection('service_requests')
             .doc(widget.text)
             .delete();
-        showSnackBar(context, "Request rejected and document deleted.");
+        showSnackBar(context, "Request rejected ");
       } catch (e) {
         showSnackBar(context, "Error in deleting the request");
       }
@@ -241,7 +251,8 @@ class _MechanicNotificationState extends State<MechanicNotification> {
                                       longitude: position?.longitude ?? 0.0,
                                       latitude: position?.latitude ?? 0.0,
                                       profilePic: widget.userProfilePicture,
-                                      name: widget.mechanicName);
+                                      name: widget.mechanicName,
+                                      userId: widget.text);
                                   showSnackBar(context,
                                       "Send notificaton to ${widget.userName}");
                                 } catch (error) {

@@ -3,8 +3,10 @@ class MechanicResponse {
   final double? longitude;
   final String mechanicId;
   final String profilePic;
+  final String userId;
   final String name;
   MechanicResponse({
+    required this.userId,
     required this.longitude,
     required this.mechanicId,
     required this.profilePic,
@@ -18,6 +20,7 @@ class MechanicResponse {
       'profilePic': profilePic,
       'name': name,
       'mechanicId': mechanicId,
+      'userId': userId
     };
   }
 }
