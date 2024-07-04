@@ -2,14 +2,13 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/map_pages.dart';
-import 'package:first/pages/user_module/user_messaging.dart';
+import 'package:first/pages/user_module/user_cards/mech_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
 import '../../models/user_models.dart';
 import '../../providers/chat_services.dart';
-import '../../utils/user_tile.dart';
 import 'user_cards/chat_bot.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/colors.dart';
@@ -203,7 +202,7 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   return FutureBuilder<List<String>>(
-    future: chatService.getMechanicUIDs(auth.currentUser!.phoneNumber!),
+    future: chatService.getAcceptedMechanicUIDs(auth.currentUser!.phoneNumber!),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return SizedBox.shrink();
@@ -212,22 +211,27 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
       } else {
         List<String> mechanicUIDs = snapshot.data!;
         if (mechanicUIDs.contains(userData["phoneNumber"])) {
-          return UserTile(
-            text: userData["name"],
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                    receiverEmail: userData["email"],
-                    receiverID: userData["uid"],
-                    profilePic: userData["profilePic"],
-                    receiverName: userData['name'],
-                  ),
-                ),
-              );
-            },
-          );
+          return MechanicCardFromUserHomeScreen(
+              mechanicId: userData["uid"],
+              mechanicName: userData['name'],
+              mechanicPicture: userData["profilePic"],
+              mechanicEmail: userData["email"]);
+          // return UserTile(
+          //   text: userData["name"],
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ChatPage(
+          //           receiverEmail: userData["email"],
+          //           receiverID: userData["uid"],
+          //           profilePic: userData["profilePic"],
+          //           receiverName: userData['name'],
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // );
         } else {
           return Container();
         }

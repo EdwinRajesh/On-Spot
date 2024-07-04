@@ -69,12 +69,13 @@ class _MechanicNotificationState extends State<MechanicNotification> {
       try {
         ChatService chatService = ChatService();
         await chatService.SendMechanicResponse(
-            mechanicId: widget.mechanicId!,
-            longitude: widget.longitude,
-            latitude: widget.latitude,
-            profilePic: widget.profilePic,
-            name: widget.mechanicName,
-            userId: widget.text);
+          mechanicId: widget.mechanicId!,
+          longitude: widget.longitude,
+          latitude: widget.latitude,
+          profilePic: widget.profilePic,
+          name: widget.mechanicName,
+          userId: widget.text,
+        );
         showSnackBar(context, "user request accepted");
       } catch (error) {
         showSnackBar(context, "message not sent try again");
