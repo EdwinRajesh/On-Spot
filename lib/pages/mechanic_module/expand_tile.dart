@@ -69,6 +69,12 @@ class _MechanicNotificationState extends State<MechanicNotification> {
       try {
         ChatService chatService = ChatService();
         await chatService.SendMechanicResponse(
+          userName: widget.userName,
+          problemDescription: widget.problemDescription,
+          model: widget.model,
+          manufacture: widget.manufacture,
+          fuel: widget.fuel,
+          year: widget.year,
           mechanicId: widget.mechanicId!,
           longitude: widget.longitude,
           latitude: widget.latitude,
@@ -253,7 +259,14 @@ class _MechanicNotificationState extends State<MechanicNotification> {
                                       latitude: position?.latitude ?? 0.0,
                                       profilePic: widget.userProfilePicture,
                                       name: widget.mechanicName,
-                                      userId: widget.text);
+                                      userId: widget.text,
+                                      problemDescription:
+                                          widget.problemDescription,
+                                      model: widget.model,
+                                      fuel: widget.fuel,
+                                      userName: widget.userName,
+                                      manufacture: widget.manufacture,
+                                      year: widget.year);
                                   showSnackBar(context,
                                       "Send notificaton to ${widget.userName}");
                                 } catch (error) {

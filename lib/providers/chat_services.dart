@@ -4,6 +4,8 @@
 
 //import 'package:chat_app_3/models/message.dart';
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/models/mechanic_accept_model.dart';
@@ -89,6 +91,32 @@ class ChatService {
     });
   }
 
+  Stream<List<Map<String, dynamic>>> getAcceptedUserStream(String mechanicId) {
+    try {
+      CollectionReference<Map<String, dynamic>> mechanicRef = FirebaseFirestore
+          .instance
+          .collection('mechanic')
+          .doc(mechanicId)
+          .collection('request_accept');
+
+      return mechanicRef.snapshots().map((snapshot) {
+        return snapshot.docs.map((doc) {
+          final requestData = doc.data();
+          if (requestData.isNotEmpty) {
+            print("Request data available: $requestData");
+          } else {
+            print("No request data available");
+          }
+          return requestData;
+        }).toList();
+      });
+    } catch (error) {
+      // Handle errors
+      print('Error retrieving service requests: $error');
+      return Stream.empty(); // Return an empty stream in case of error
+    }
+  }
+
   Stream<List<Map<String, dynamic>>> getUserRequestStream(String mechanicId) {
     try {
       CollectionReference<Map<String, dynamic>> mechanicRef = FirebaseFirestore
@@ -116,23 +144,35 @@ class ChatService {
   }
 
   Future<void> SendMechanicResponse({
+    required String problemDescription,
+    required String userName,
+    required String model,
+    required String manufacture,
     required String mechanicId,
     required double longitude,
     required double latitude,
     required String profilePic,
     required String name,
     required String userId,
+    required String fuel,
+    required String year,
   }) async {
     final User? currentUser = _auth.currentUser;
     if (currentUser != null) {
       MechanicResponse mechanicResponse = MechanicResponse(
+          problemDescription: problemDescription,
           longitude: longitude,
           mechanicId: mechanicId,
           profilePic: profilePic,
           name: name,
           latitude: latitude,
-          userId: userId);
-      String chatRoomID = currentUser.phoneNumber!;
+          userId: userId,
+          userName: userName,
+          model: model,
+          manufacture: manufacture,
+          fuel: fuel,
+          year: year);
+      String chatRoomID = userId;
 
       await _firestore
           .collection('mechanic')

@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, unused_element, prefer_const_constructors_in_immutables
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/mechanic_module/expand_tile.dart';
@@ -79,7 +80,7 @@ class _MechanicHomeScreenState extends State<MechanicHomeScreen> {
               SizedBox(
                 height: 48,
               ),
-              _buildUserList(chatService, auth),
+              _buildUserList(chatService, auth, context),
             ],
           ),
         ),
@@ -165,9 +166,11 @@ Widget _buildUserRequestListItem(
       });
 }
 
-Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
+Widget _buildUserList(
+    ChatService chatService, FirebaseAuth auth, BuildContext context) {
   return StreamBuilder(
-    stream: chatService.getUserStream(),
+    stream:
+        chatService.getAcceptedUserStream(auth.currentUser?.phoneNumber ?? ''),
     builder: (context, snapshot) {
       if (snapshot.hasError) {
         return const Text("Error");
@@ -190,25 +193,29 @@ Widget _buildUserList(ChatService chatService, FirebaseAuth auth) {
 }
 
 Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
-  FirebaseAuth auth = FirebaseAuth.instance;
+  return UserTile(
+    text: userData["userName"],
+    onTap: () async {
+      String email = await fetchEmailByUserId(userData["userId"]);
 
-  if (userData["email"] != auth.currentUser?.email) {
-    return UserTile(
-      text: userData["name"],
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatPage(
-                profilePic: userData['profilePic'],
-                receiverEmail: userData["email"],
-                receiverID: userData["uid"],
-                receiverName: userData['name']),
-          ),
-        );
-      },
-    );
-  } else {
-    return Container();
-  }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatPage(
+              profilePic: userData['profilePic'],
+              receiverEmail: email,
+              receiverID: userData["userId"],
+              receiverName: userData['userName']),
+        ),
+      );
+    },
+  );
+}
+
+Future<String> fetchEmailByUserId(String userId) async {
+  DocumentSnapshot docSnapshot =
+      await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+  Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
+  return userData['email'] as String;
 }
