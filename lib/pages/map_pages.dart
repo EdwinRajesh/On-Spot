@@ -1,13 +1,11 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:first/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../providers/chat_services.dart';
 import 'map_module.dart/mech_details_onmap.dart';
-//import 'mechanic_details_page.dart';
 
 class MapPage extends StatefulWidget {
   final String selectedService;
@@ -121,13 +119,24 @@ class _MapPageState extends State<MapPage> {
                           left: 20.0,
                           right: 20.0,
                           child: SizedBox(
-                            height: 120.0,
+                            height: 140.0,
                             child: ListView.builder(
                               controller: _scrollController,
                               scrollDirection: Axis.horizontal,
                               itemCount: mechanicsData.length,
                               itemBuilder: (context, index) {
                                 final mechanic = mechanicsData[index];
+                                final LatLng mechanicLocation =
+                                    mechanicLocations[index];
+                                final double distance =
+                                    Geolocator.distanceBetween(
+                                          currentposition!.latitude,
+                                          currentposition!.longitude,
+                                          mechanicLocation.latitude,
+                                          mechanicLocation.longitude,
+                                        ) /
+                                        1000; // Convert to kilometers
+
                                 return GestureDetector(
                                   onTap: () {
                                     setState(() {
@@ -163,11 +172,7 @@ class _MapPageState extends State<MapPage> {
                                         ),
                                       ],
                                     ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                    child: Stack(
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
@@ -191,32 +196,38 @@ class _MapPageState extends State<MapPage> {
                                                       'profilePic',
                                                 ),
                                               ),
+                                              SizedBox(height: 4.0),
+                                              Text(
+                                                '${distance.toStringAsFixed(2)} km away',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              8, 8, 16, 0),
+                                        Positioned(
+                                          top: 8.0,
+                                          right: 8.0,
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
                                             children: [
                                               Text(
                                                 mechanic['rating'] ?? "NA",
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18.0,
-                                                    color: Colors.amber),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.0,
+                                                  color: Colors.amber,
+                                                ),
                                               ),
                                               Icon(
                                                 Icons.star,
                                                 color: Colors.amber,
-                                              )
+                                              ),
                                             ],
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
