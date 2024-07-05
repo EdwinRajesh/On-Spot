@@ -38,7 +38,10 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
             const SizedBox(
               width: 8,
             ),
-            Text(widget.mechanicName),
+            Text(
+              widget.mechanicName,
+              style: TextStyle(fontSize: 16),
+            ),
           ],
         ),
         backgroundColor: secondaryColor,
