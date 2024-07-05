@@ -19,7 +19,7 @@ class UserTile extends StatelessWidget {
             color: primaryColor,
             borderRadius: BorderRadius.circular(12),
           ),
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 56),
           padding: const EdgeInsets.all(20),
           child: Row(
             children: [

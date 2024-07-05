@@ -4,14 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/pages/mechanic_module/expand_tile.dart';
 import 'package:first/pages/mechanic_module/mechanic_profile.dart';
+import 'package:first/pages/mechanic_module/mechanic_stateless/user_card_from_mechanic_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_services.dart';
 
 import '../../utils/colors.dart';
-import '../../utils/user_tile.dart';
-import '../user_module/user_messaging.dart';
 
 class MechanicHomeScreen extends StatefulWidget {
   MechanicHomeScreen({super.key});
@@ -103,13 +102,22 @@ Widget _buildUserRequestList(ChatService chatService, FirebaseAuth auth) {
       }
 
       if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-        return Text(
-            "No user requests available"); // Show a message when there is no data
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 16, 8.0, 0),
+            child: Text(
+              "No new user requests available",
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Color.fromARGB(31, 0, 0, 0)),
+            ),
+          ),
+        ); // Show a message when there is no data
       }
 
-      // Build the list of user request items
-      return Container(
-        height: 250,
+      return SizedBox(
+        height: 350,
         child: ListView(
           children: (snapshot.data as List).map<Widget>((userData) {
             return _buildUserRequestListItem(userData, context);
@@ -193,22 +201,14 @@ Widget _buildUserList(
 }
 
 Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
-  return UserTile(
-    text: userData["userName"],
-    onTap: () async {
-      String email = await fetchEmailByUserId(userData["userId"]);
+  return UserCardFromMechanicHomeScreen(
+    userId: userData['userId'],
+    userName: userData['userName'],
+    latitude: userData['latitude'],
+    longitude: userData['longitude'],
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatPage(
-              profilePic: userData['profilePic'],
-              receiverEmail: email,
-              receiverID: userData["userId"],
-              receiverName: userData['userName']),
-        ),
-      );
-    },
+    mechanicId: userData['mechanicId'],
+    // vehicleManufacture: userData['manufacture']
   );
 }
 

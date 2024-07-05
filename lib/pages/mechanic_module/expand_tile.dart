@@ -82,6 +82,16 @@ class _MechanicNotificationState extends State<MechanicNotification> {
           name: widget.mechanicName,
           userId: widget.text,
         );
+        try {
+          await FirebaseFirestore.instance
+              .collection('mechanic')
+              .doc(widget.mechanicId)
+              .collection('service_requests')
+              .doc(widget.text)
+              .delete();
+        } catch (e) {
+          showSnackBar(context, "Error");
+        }
         showSnackBar(context, "user request accepted");
       } catch (error) {
         showSnackBar(context, "message not sent try again");

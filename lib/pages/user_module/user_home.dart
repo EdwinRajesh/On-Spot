@@ -216,22 +216,7 @@ Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
               mechanicName: userData['name'],
               mechanicPicture: userData["profilePic"],
               mechanicEmail: userData["email"]);
-          // return UserTile(
-          //   text: userData["name"],
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ChatPage(
-          //           receiverEmail: userData["email"],
-          //           receiverID: userData["uid"],
-          //           profilePic: userData["profilePic"],
-          //           receiverName: userData['name'],
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // );
+        
         } else {
           return Container();
         }
