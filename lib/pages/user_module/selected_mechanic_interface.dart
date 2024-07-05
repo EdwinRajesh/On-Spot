@@ -2,13 +2,17 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
+import 'package:first/utils/button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/secondary.dart';
 import '../../utils/user_tile.dart';
+import '../../utils/utils.dart';
 import 'user_messaging.dart';
 
 class SelectedMechanicScreen extends StatefulWidget {
@@ -249,6 +253,40 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
                         style: TextStyle(fontSize: 22, color: Colors.red),
                       ),
                     ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 96),
+            child: Container(
+              child: CustomButton(
+                  text: 'close',
+                  onPressed: () async {
+                    FirebaseAuth auth = FirebaseAuth.instance;
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('mechanic')
+                          .doc(widget.mechanicId)
+                          .collection('request_accept')
+                          .doc(auth.currentUser
+                              ?.phoneNumber) // Replace with the document ID you want to delete
+                          .delete();
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserNavPage(
+                            index: 1,
+                          ),
+                        ),
+                      );
+
+                      showSnackBar(context, "communication channel closed");
+
+                      print('Document deleted successfully.');
+                    } catch (e) {
+                      print('Error deleting document: $e');
+                    }
+                  }),
+            ),
+          )
         ],
       ),
     );

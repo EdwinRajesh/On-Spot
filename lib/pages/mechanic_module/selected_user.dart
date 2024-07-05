@@ -183,26 +183,6 @@ class _SelectedUserFromMechanicInterfaceState
               hasPaid
                   ? Text("Payment received successfully")
                   : SizedBox.shrink(),
-              SecondaryButton(
-                  text: 'close',
-                  onPressed: () async {
-                    try {
-                      await FirebaseFirestore.instance
-                          .collection('mechanic')
-                          .doc(widget.mechanicId)
-                          .collection('request_accept')
-                          .doc(widget
-                              .userId) // Replace with the document ID you want to delete
-                          .delete();
-
-                      Navigator.pop(context, true);
-                      showSnackBar(context, "communication channel closed");
-
-                      print('Document deleted successfully.');
-                    } catch (e) {
-                      print('Error deleting document: $e');
-                    }
-                  })
             ],
           ),
         ),

@@ -37,14 +37,14 @@ class MechanicDetailsPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              'Experience: ${mechanic['Experience']}',
-              style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: secondaryColor),
-            ),
-            SizedBox(height: 8.0),
+            // Text(
+            //   'Experience: ${mechanic['Experience']}',
+            //   style: TextStyle(
+            //       fontSize: 18.0,
+            //       fontWeight: FontWeight.bold,
+            //       color: secondaryColor),
+            // ),
+            // SizedBox(height: 8.0),
             SizedBox(height: 4.0),
             Text(
               '${mechanic['bio'] ?? 'No bio available.'}',
