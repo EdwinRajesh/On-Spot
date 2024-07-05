@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../models/car_model.dart';
 import '../../utils/colors.dart';
@@ -26,8 +28,10 @@ class UserRequestMechanic extends StatefulWidget {
 
 class _UserRequestMechanicState extends State<UserRequestMechanic> {
   bool _isLoading = false;
-  String problemDescription =
-      ''; // Add a variable to store the problem description
+  String problemDescription = '';
+  final String deviceToken =
+      'eb1u4VLfQZmxF6GlFzVO3q:APA91bHCMPw5vudJm8jsyq6WBAG5yTU2BLPNYzMPdlupaPVctQMP8knq1zUycWEDJdyRE8STMe42Z-c1ENi5W4RHSRsk7MqkbFREkN0oesf0pFt48AC9AFAuJaKIKnedvn_I2TmVbegZ';
+// Add a variable to store the problem description
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +157,11 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
                                   fuel: widget.car.fuel!,
                                   latitude: position?.latitude ?? 0.0,
                                   longitude: position?.longitude ?? 0.0);
+                              await sendNotificationToDevice(
+                                deviceToken,
+                                'ON-SPOT MECHANIC',
+                                'Need Assistance!',
+                              );
 
                               showSnackBar(context,
                                   " message successfully sent to the mechanic");
@@ -176,6 +185,51 @@ class _UserRequestMechanicState extends State<UserRequestMechanic> {
               ),
             ),
     );
+  }
+
+  Future<void> sendNotificationToDevice(
+      String token, String title, String body) async {
+    final String serverKey =
+        'AAAAgyaQYww:APA91bHP73jyX3necJR0LZFnE68IWrA2bzLLb2jAxAZoqc1gF41nzCSf_xVadnRFtPbUNrodzSLRqfcr7AMmjatne5uND2teh4bd4MM_zlXqUDfcLtzehFmWBBcPvCnX8YPq3_bA18Ar'; // Replace with your Firebase server key
+    final String fcmUrl = 'https://fcm.googleapis.com/fcm/send';
+
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'key=$serverKey',
+    };
+
+    final Map<String, dynamic> notification = {
+      'body': body,
+      'title': title,
+    };
+
+    final Map<String, dynamic> data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+    };
+    final Map<String, dynamic> message = {
+      'notification': notification,
+      'data': data,
+      'to': token,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(fcmUrl),
+        headers: headers,
+        body: json.encode(message),
+      );
+
+      if (response.statusCode == 200) {
+        print('Notification sent successfully');
+      } else {
+        print(
+            'Failed to send notification. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending notification: $e');
+    }
   }
 
   Future<LatLng?> _getLocationUpdate() async {

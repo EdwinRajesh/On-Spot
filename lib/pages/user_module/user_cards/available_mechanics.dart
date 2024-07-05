@@ -2,11 +2,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/mechanic_model.dart';
-import '../../providers/chat_services.dart';
-import '../../utils/colors.dart';
-import '../../utils/user_tile.dart';
-import 'user_messaging.dart';
+import '../../../models/mechanic_model.dart';
+import '../../../providers/chat_services.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/user_tile.dart';
+import '../user_messaging.dart';
 
 class NearbyMechanicsScreen extends StatefulWidget {
   final String selectedService;

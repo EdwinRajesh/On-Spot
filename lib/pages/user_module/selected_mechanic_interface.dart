@@ -1,6 +1,11 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/user_tile.dart';
@@ -23,6 +28,118 @@ class SelectedMechanicScreen extends StatefulWidget {
 }
 
 class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
+  String serviceFee = '';
+  bool isLoading = true;
+  Razorpay _razorpay = Razorpay();
+  bool hasPaid = false;
+  late SharedPreferences _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSharedPreferences();
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _externalWallet);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _paymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _paymentFailure);
+    _fetchServiceFee();
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear(); // Dispose the Razorpay instance when not needed
+    super.dispose();
+  }
+
+  void _paymentSuccess(PaymentSuccessResponse response) {
+    Fluttertoast.showToast(
+        msg: "Payment successful: ${response.paymentId}",
+        timeInSecForIosWeb: 4);
+    // Update Firestore with the service fee status
+    _updateServiceFeeStatus(true);
+    _savePaymentStatus(true);
+  }
+
+  void _paymentFailure(PaymentFailureResponse response) {
+    Fluttertoast.showToast(
+        msg: "Payment failed: ${response.code} - ${response.message}",
+        timeInSecForIosWeb: 4);
+    // Update Firestore with the service fee status
+    _updateServiceFeeStatus(false);
+  }
+
+  void _externalWallet(ExternalWalletResponse response) {
+    Fluttertoast.showToast(
+        msg: "External wallet selected: ${response.walletName}",
+        timeInSecForIosWeb: 4);
+  }
+
+  void makePayment() async {
+    var options = {
+      'key': 'rzp_test_LHmm4k8DuraSma',
+      'amount': int.parse(serviceFee) * 100, // Amount in paise
+      'name': widget.mechanicName,
+      'description': 'Service fee payment',
+      'prefill': {'contact': "9605642345", 'email': widget.mechanicEmail},
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  void _initializeSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  // Method to save payment status to SharedPreferences
+  Future<void> _savePaymentStatus(bool status) async {
+    await _prefs.setBool('hasPaid', true);
+  }
+
+  Future<void> _fetchServiceFee() async {
+    try {
+      FirebaseAuth auth = FirebaseAuth.instance;
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('mechanic')
+          .doc(widget.mechanicId)
+          .collection('request_accept')
+          .doc(auth.currentUser!.phoneNumber)
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          serviceFee = doc['serviceFee'] ?? '';
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching service fee: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateServiceFeeStatus(bool status) async {
+    try {
+      FirebaseAuth auth = FirebaseAuth.instance;
+      await FirebaseFirestore.instance
+          .collection('mechanic')
+          .doc(widget.mechanicId)
+          .collection('request_accept')
+          .doc(auth.currentUser!.phoneNumber)
+          .update({'feeSent': status});
+    } catch (e) {
+      print('Error updating service fee status: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +185,70 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
                 ),
               );
             },
-          )
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          isLoading
+              ? CircularProgressIndicator()
+              : serviceFee.isNotEmpty
+                  ? hasPaid
+                      ? Text(
+                          'Payment completed',
+                          style: TextStyle(fontSize: 20, color: primaryColor),
+                        )
+                      : Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Service fee: ₹$serviceFee',
+                                style: TextStyle(
+                                    fontSize: 22, color: primaryColor),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                FirebaseAuth auth = FirebaseAuth.instance;
+                                makePayment();
+                                Future.delayed(
+                                  Duration(seconds: 10),
+                                  () {
+                                    setState(() {
+                                      hasPaid = true;
+                                    });
+                                  },
+                                );
+                                _savePaymentStatus(true);
+                                await FirebaseFirestore.instance
+                                    .collection('mechanic')
+                                    .doc(widget.mechanicId)
+                                    .collection('request_accept')
+                                    .doc(auth.currentUser?.phoneNumber!)
+                                    .set({
+                                  'hasPaid': true,
+                                }, SetOptions(merge: true));
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(primaryColor),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
+                              ),
+                              child: const Text(
+                                'Pay',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        )
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'No service fee sent yet',
+                        style: TextStyle(fontSize: 22, color: Colors.red),
+                      ),
+                    ),
         ],
       ),
     );

@@ -1,8 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:first/pages/mechanic_module/mechanic_map.dart';
+import 'package:first/utils/register_textfield.dart';
+import 'package:first/utils/secondary.dart';
 import 'package:first/utils/user_tile.dart';
+import 'package:first/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
 import '../user_module/user_messaging.dart';
@@ -32,6 +37,60 @@ class SelectedUserFromMechanicInterface extends StatefulWidget {
 
 class _SelectedUserFromMechanicInterfaceState
     extends State<SelectedUserFromMechanicInterface> {
+  TextEditingController paymentController = TextEditingController();
+  bool isFeeSent = false;
+  String sentFee = '';
+  bool isLoading = true;
+  bool hasPaid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFeeSentState();
+  }
+
+  _loadFeeSentState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isFeeSent = prefs.getBool('isFeeSent') ?? false;
+      sentFee = prefs.getString('sentFee') ?? '';
+    });
+  }
+
+  _saveFeeSentState(bool feeSent, String fee) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFeeSent', feeSent);
+    await prefs.setString('sentFee', fee);
+  }
+
+  Future<void> _fetchPaymentStatus() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('mechanic')
+          .doc(widget.mechanicId)
+          .collection('request_accept')
+          .doc(widget.userId) // Replace with dynamic user ID
+          .get();
+      print(doc);
+      if (doc.exists) {
+        setState(() {
+          hasPaid = doc['hasPaid'] == 'true';
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        print('Document does not exist');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error fetching document: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,69 +112,161 @@ class _SelectedUserFromMechanicInterfaceState
         foregroundColor: secondaryColor,
         elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Center(
-              child: GestureDetector(
-                onTap: () => Navigator.push(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MechanicMap(
+                                latitude: widget.longitude ?? 0.0,
+                                longitude: widget.latitude ?? 0.0,
+                              ))),
+                  child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 56, vertical: 16),
+                      decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(8)),
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "User Location",
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Icon(
+                              Icons.location_pin,
+                              color: primaryColor,
+                              size: 24,
+                            )
+                          ],
+                        ),
+                      )),
+                ),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              UserTile(
+                text: "Message",
+                onTap: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => MechanicMap(
-                              latitude: widget.longitude ?? 0.0,
-                              longitude: widget.latitude ?? 0.0,
-                            ))),
-                child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 56, vertical: 16),
-                    decoration: BoxDecoration(
-                        color: secondaryColor,
-                        borderRadius: BorderRadius.circular(8)),
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "User Location",
-                            style: TextStyle(
-                                color: primaryColor,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Icon(
-                            Icons.location_pin,
-                            color: primaryColor,
-                            size: 24,
-                          )
-                        ],
+                      builder: (context) => ChatPage(
+                        receiverEmail: widget.userEmail,
+                        receiverID: widget.userId,
+                        profilePic: widget.userPhoto,
+                        receiverName: widget.userName,
                       ),
-                    )),
-              ),
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            UserTile(
-              text: "Message",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                      receiverEmail: widget.userEmail,
-                      receiverID: widget.userId,
-                      profilePic: widget.userPhoto,
-                      receiverName: widget.userName,
                     ),
-                  ),
-                );
-              },
-            )
-          ],
+                  );
+                },
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              paymentButton(),
+              SizedBox(
+                height: 24,
+              ),
+              hasPaid
+                  ? Text("Payment received successfully")
+                  : SizedBox.shrink(),
+              SecondaryButton(
+                  text: 'close',
+                  onPressed: () async {
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('mechanic')
+                          .doc(widget.mechanicId)
+                          .collection('request_accept')
+                          .doc(widget
+                              .userId) // Replace with the document ID you want to delete
+                          .delete();
+
+                      Navigator.pop(context, true);
+                      showSnackBar(context, "communication channel closed");
+
+                      print('Document deleted successfully.');
+                    } catch (e) {
+                      print('Error deleting document: $e');
+                    }
+                  })
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Container paymentButton() {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      child: isFeeSent
+          ? Center(
+              child: Text(
+                'Service fee sent: ₹$sentFee',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.black45,
+                    fontWeight: FontWeight.bold),
+              ),
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: RegisterTextField(
+                    hintText: 'Enter the service fee',
+                    obscureText: false,
+                    widgetController: paymentController,
+                  ),
+                ),
+                SizedBox(width: 4),
+                SecondaryButton(
+                  text: "Send",
+                  onPressed: () async {
+                    String price = paymentController.text;
+                    if (price.isNotEmpty) {
+                      try {
+                        // Update the document in the "request_accept" collection
+                        await FirebaseFirestore.instance
+                            .collection('mechanic')
+                            .doc(widget.mechanicId)
+                            .collection('request_accept')
+                            .doc(widget.userId)
+                            .set({
+                          'serviceFee': price,
+                        }, SetOptions(merge: true));
+
+                        setState(() {
+                          isFeeSent = true;
+                          sentFee = price;
+                        });
+                        _saveFeeSentState(true, price);
+
+                        print('Price sent successfully');
+                      } catch (e) {
+                        print('Failed to send price: $e');
+                      }
+                    } else {
+                      print('Price is empty');
+                    }
+                  },
+                ),
+              ],
+            ),
     );
   }
 }
