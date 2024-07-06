@@ -1,16 +1,16 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
+import 'package:first/pages/user_module/user_home.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:first/pages/user_module/user_cards/user_nav_screen.dart';
-import 'package:first/utils/button.dart';
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../utils/colors.dart';
-import '../../utils/user_tile.dart';
-import '../../utils/utils.dart';
+import 'package:first/utils/button.dart';
+import 'package:first/utils/colors.dart';
+
+import 'package:first/utils/user_tile.dart';
+
 import 'user_messaging.dart';
 
 class SelectedMechanicScreen extends StatefulWidget {
@@ -18,12 +18,14 @@ class SelectedMechanicScreen extends StatefulWidget {
   final String mechanicProfilePicture;
   final String mechanicId;
   final String mechanicEmail;
-  const SelectedMechanicScreen(
-      {super.key,
-      required this.mechanicName,
-      required this.mechanicProfilePicture,
-      required this.mechanicId,
-      required this.mechanicEmail});
+
+  const SelectedMechanicScreen({
+    Key? key,
+    required this.mechanicName,
+    required this.mechanicProfilePicture,
+    required this.mechanicId,
+    required this.mechanicEmail,
+  }) : super(key: key);
 
   @override
   State<SelectedMechanicScreen> createState() => _SelectedMechanicScreenState();
@@ -34,10 +36,12 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
   bool isLoading = true;
   Razorpay _razorpay = Razorpay();
   bool hasPaid = false;
+  late SharedPreferences _prefs;
 
   @override
   void initState() {
     super.initState();
+    _initializeSharedPreferences();
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _externalWallet);
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _paymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _paymentFailure);
@@ -56,6 +60,7 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
         timeInSecForIosWeb: 4);
     // Update Firestore with the service fee status
     _updateServiceFeeStatus(true);
+    _savePaymentStatus(true);
   }
 
   void _paymentFailure(PaymentFailureResponse response) {
@@ -88,6 +93,15 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
     }
   }
 
+  void _initializeSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  // Method to save payment status to SharedPreferences
+  Future<void> _savePaymentStatus(bool status) async {
+    await _prefs.setBool('hasPaid', true);
+  }
+
   Future<void> _fetchServiceFee() async {
     try {
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -95,7 +109,7 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
           .collection('mechanic')
           .doc(widget.mechanicId)
           .collection('request_accept')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(auth.currentUser!.phoneNumber!)
           .get();
 
       if (doc.exists) {
@@ -123,11 +137,114 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
           .collection('mechanic')
           .doc(widget.mechanicId)
           .collection('request_accept')
-          .doc(auth.currentUser!.phoneNumber)
+          .doc(auth.currentUser!.phoneNumber!)
           .update({'feeSent': status});
     } catch (e) {
       print('Error updating service fee status: $e');
     }
+  }
+
+  void _showRatingDialog(BuildContext context) {
+    int _rating = 1; // Default rating
+    double _dragPosition = 0.0;
+    double _dragPercentage = 0.0;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return GestureDetector(
+              onVerticalDragUpdate: (details) {
+                setState(() {
+                  _dragPosition += details.primaryDelta!;
+                  _dragPercentage = _dragPosition / MediaQuery.of(context).size.height;
+                });
+              },
+              onVerticalDragEnd: (details) {
+                if (_dragPercentage > 0.5) {
+                  Navigator.of(context).pop();
+                  // Submit the rating to Firestore
+                  FirebaseFirestore.instance
+                      .collection('mechanic')
+                      .doc(widget.mechanicId)
+                      .collection('ratings')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .set({
+                    'rating': _rating,
+                    'ratedAt': DateTime.now(),
+                  }).then((_) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserHomeScreen(),
+                      ),
+                    );
+                  });
+                } else {
+                  setState(() {
+                    _dragPosition = 0.0;
+                    _dragPercentage = 0.0;
+                  });
+                }
+              },
+              child: Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Rate Mechanic', style: TextStyle(fontSize: 20)),
+                      SizedBox(height: 16.0),
+                      Text('Rate from 1 to 5:', style: TextStyle(fontSize: 18)),
+                      Slider(
+                        value: _rating.toDouble(),
+                        min: 1,
+                        max: 5,
+                        divisions: 4,
+                        label: _rating.toString(),
+                        onChanged: (double value) {
+                          setState(() {
+                            _rating = value.toInt();
+                          });
+                        },
+                      ),
+                      SizedBox(height: 16.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Submit the rating to Firestore
+                          FirebaseFirestore.instance
+                              .collection('mechanic')
+                              .doc(widget.mechanicId)
+                              .collection('ratings')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .set({
+                            'rating': _rating,
+                            'ratedAt': DateTime.now(),
+                          }).then((_) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserHomeScreen(),
+                              ),
+                            );
+                          });
+                        },
+                        child: Text('Submit'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -209,6 +326,7 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
                                     });
                                   },
                                 );
+                                _savePaymentStatus(true);
                                 await FirebaseFirestore.instance
                                     .collection('mechanic')
                                     .doc(widget.mechanicId)
@@ -242,34 +360,24 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 96),
             child: Container(
               child: CustomButton(
-                  text: 'close',
-                  onPressed: () async {
-                    FirebaseAuth auth = FirebaseAuth.instance;
-                    try {
-                      await FirebaseFirestore.instance
-                          .collection('mechanic')
-                          .doc(widget.mechanicId)
-                          .collection('request_accept')
-                          .doc(auth.currentUser
-                              ?.phoneNumber) // Replace with the document ID you want to delete
-                          .delete();
+                text: 'Close',
+                onPressed: () async {
+                  _showRatingDialog(context);
+                  FirebaseAuth auth = FirebaseAuth.instance;
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('mechanic')
+                        .doc(widget.mechanicId)
+                        .collection('request_accept')
+                        .doc(auth.currentUser?.phoneNumber!)
+                        .delete();
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserNavPage(
-                            index: 1,
-                          ),
-                        ),
-                      );
-
-                      showSnackBar(context, "communication channel closed");
-
-                      print('Document deleted successfully.');
-                    } catch (e) {
-                      print('Error deleting document: $e');
-                    }
-                  }),
+                    print('Document deleted successfully.');
+                  } catch (e) {
+                    print('Error deleting document: $e');
+                  }
+                },
+              ),
             ),
           )
         ],
@@ -277,3 +385,4 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
     );
   }
 }
+
