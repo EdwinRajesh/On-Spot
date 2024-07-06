@@ -5,9 +5,7 @@ import 'package:first/pages/mechanic_module/mechanic_map.dart';
 import 'package:first/utils/register_textfield.dart';
 import 'package:first/utils/secondary.dart';
 import 'package:first/utils/user_tile.dart';
-import 'package:first/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
 import '../user_module/user_messaging.dart';
@@ -46,21 +44,6 @@ class _SelectedUserFromMechanicInterfaceState
   @override
   void initState() {
     super.initState();
-    _loadFeeSentState();
-  }
-
-  _loadFeeSentState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isFeeSent = prefs.getBool('isFeeSent') ?? false;
-      sentFee = prefs.getString('sentFee') ?? '';
-    });
-  }
-
-  _saveFeeSentState(bool feeSent, String fee) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isFeeSent', feeSent);
-    await prefs.setString('sentFee', fee);
   }
 
   Future<void> _fetchPaymentStatus() async {
@@ -234,7 +217,6 @@ class _SelectedUserFromMechanicInterfaceState
                           isFeeSent = true;
                           sentFee = price;
                         });
-                        _saveFeeSentState(true, price);
 
                         print('Price sent successfully');
                       } catch (e) {

@@ -7,10 +7,8 @@ import 'package:first/utils/button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/colors.dart';
-import '../../utils/secondary.dart';
 import '../../utils/user_tile.dart';
 import '../../utils/utils.dart';
 import 'user_messaging.dart';
@@ -36,12 +34,10 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
   bool isLoading = true;
   Razorpay _razorpay = Razorpay();
   bool hasPaid = false;
-  late SharedPreferences _prefs;
 
   @override
   void initState() {
     super.initState();
-    _initializeSharedPreferences();
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _externalWallet);
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _paymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _paymentFailure);
@@ -60,7 +56,6 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
         timeInSecForIosWeb: 4);
     // Update Firestore with the service fee status
     _updateServiceFeeStatus(true);
-    _savePaymentStatus(true);
   }
 
   void _paymentFailure(PaymentFailureResponse response) {
@@ -91,15 +86,6 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
     } catch (e) {
       debugPrint(e.toString());
     }
-  }
-
-  void _initializeSharedPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
-
-  // Method to save payment status to SharedPreferences
-  Future<void> _savePaymentStatus(bool status) async {
-    await _prefs.setBool('hasPaid', true);
   }
 
   Future<void> _fetchServiceFee() async {
@@ -223,7 +209,6 @@ class _SelectedMechanicScreenState extends State<SelectedMechanicScreen> {
                                     });
                                   },
                                 );
-                                _savePaymentStatus(true);
                                 await FirebaseFirestore.instance
                                     .collection('mechanic')
                                     .doc(widget.mechanicId)
